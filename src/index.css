@@ -1,0 +1,211 @@
+/* src/index.css */
+
+/* Import the Inter font from Google Fonts to ensure a modern and readable typeface across the site. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+/* Tailwind CSS directives:
+   @tailwind base: Injects Tailwind's base styles, which normalize CSS and set up sensible defaults.
+   @tailwind components: Injects class names for custom components (if defined).
+   @tailwind utilities: Injects all of Tailwind's utility classes (e.g., for spacing, colors, flexbox).
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles for the entire body of the application */
+body {
+  /* Remove default browser margin to ensure the layout starts flush with the viewport edges. */
+  margin: 0;
+  /* Apply the 'Inter' font globally, with a fallback to generic sans-serif fonts. */
+  font-family: 'Inter', sans-serif;
+  /* Set a consistent background color to Soft Ivory Mist (#F2F0EF) for the entire page,
+     providing a clean, elegant base. */
+  background-color: #F0F2F5; /* Using the LightGrey from VizoColors for consistency */
+  /* Enable smooth scrolling behavior for a better user experience when navigating to anchor links. */
+  scroll-behavior: smooth;
+  /* Set the default text color to Deep Soul of the Ocean (#245F73) for excellent readability and richness. */
+  color: #333333; /* Using DarkText from VizoColors for consistency */
+  /* Enhance font rendering on WebKit and Mozilla browsers for smoother, sharper text. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Keyframe Animations for the Homepage Renaissance */
+
+/* Animation for elements that slide up into view (used for hero text, etc.) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out forwards; /* Adjusted duration for smoother effect */
+}
+
+/* Animation for the scroll indicator: a slow, gentle bounce */
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 2s infinite ease-in-out;
+}
+
+/* Animation for floating decorative elements: subtle, slow movement */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-5px) translateX(5px);
+  }
+  50% {
+    transform: translateY(0px) translateX(0px);
+  }
+  75% {
+    transform: translateY(5px) translateX(-5px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s infinite ease-in-out;
+}
+
+/* Animation for pulsing decorative elements: subtle scaling and opacity changes */
+@keyframes pulseSlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.25;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 4s infinite ease-in-out;
+}
+
+/* Animation for decorative pinging elements: expanding and fading out */
+@keyframes pingSlow {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-slow {
+  animation: pingSlow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Animation for spinning icons/elements */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 5s linear infinite;
+}
+
+/* Custom text shadow for the hero title to give it more depth and presence. */
+.text-shadow-hero {
+  text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3), /* Deeper shadow for main text */
+               0px 0px 20px rgba(249, 249, 249, 0.5); /* Soft glow from OffWhite */
+}
+
+/* Custom shadow for elements that need extra depth, like the hero section and CTA. */
+.shadow-3xl {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3),
+              0 10px 20px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* No need for .text-shadow-md or specific ease functions here,
+   as they are directly handled by Tailwind or inline styles in HomePage.jsx for granular control. */
+
+/* Explicit Tailwind-like hover effects for elements if not fully covered by JIT mode or default config */
+/* Ensure these align with the HomePage.jsx logic where group-hover is used */
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+.group:hover .group-hover\:scale-103 {
+  transform: scale(1.03);
+}
+.group:hover .group-hover\:-translate-y-2 {
+  transform: translateY(-8px);
+}
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1;
+}
+.group:hover .group-hover\:translate-x-full {
+  transform: translateX(0%); /* Corrected for the CTA button's swipe effect */
+}
+/* Add these to your global CSS file, e.g., src/index.css */
+
+/* For Product Detail Page Animations */
+@keyframes fade-in-quick {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-fade-in-quick {
+    animation: fade-in-quick 0.5s ease-out forwards;
+}
+
+@keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+    animation: slide-in-right 0.8s ease-out forwards;
+}
+
+@keyframes button-confirm {
+    0% { transform: scale(1); background-color: #e66b3b; } /* AccentOrange */
+    50% { transform: scale(1.02); background-color: #4CAF50; } /* AccentGreen */
+    100% { transform: scale(1); background-color: #e66b3b; } /* AccentOrange */
+}
+.animate-button-confirm {
+    animation: button-confirm 1.5s ease-out forwards;
+}
+
+/* Hotspot animation */
+@keyframes pulse-light {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+.animate-pulse-light {
+    animation: pulse-light 2s infinite ease-in-out;
+}
+
+/* Custom Shadows (if not using Tailwind config extend) */
+.shadow-soft-3d {
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.08), 0px 2px 8px rgba(0, 0, 0, 0.05);
+}
+.shadow-inset-3d {
+    box-shadow: inset 0px 0px 20px rgba(0, 0, 0, 0.05), inset 0px 0px 5px rgba(0, 0, 0, 0.02);
+}
+.shadow-3xl-glow { /* For related products card hover */
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15),
+              0 5px 15px rgba(0,0,0,0.1),
+              0 0 30px rgba(230, 107, 59, 0.3); /* AccentOrange glow */
+}
+.shadow-inner-soft {
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), inset 0 -2px 4px rgba(0,0,0,0.03);
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZShop - Experience Luxury E-commerce</title>
+    <!-- Favicon: A small icon for your browser tab, styled with a subtle shopping bag emoji -->
+    <link rel="icon" href="https://placehold.co/32x32/2b2b2b/FFFFFF?text=🛍️" type="image/x-icon">
+
+    <!-- Google Fonts: Linking the 'Inter' font for a modern and clean typographic aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN: Directly includes the Tailwind CSS framework for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Configuration: Extends Tailwind's default theme with your custom luxury color palette
+         and sets 'Inter' as the default sans-serif font. This script MUST come AFTER the Tailwind CDN. -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Your custom luxury color palette defined for easy use in Tailwind classes
+                        white: '#FFFFFF',
+                        lightGrey: '#d4d4d4', // Used for subtle backgrounds and borders
+                        mediumGrey: '#b3b3b3', // Used for secondary text and hover states
+                        darkGrey: '#2b2b2b',   // Used for primary text, buttons, and strong elements
+                        // A slightly darker grey for contrast against lightGrey, used in some backgrounds
+                        offWhite: '#f8f8f8',
+                    },
+                    fontFamily: {
+                        // Sets 'Inter' as the primary sans-serif font throughout the application
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Inline Style Block: Basic body styles for initial rendering consistency before React loads.
+         Main gradient background will be applied by App.js for dynamic transitions. -->
+    <style>
+      body {
+        font-family: 'Inter', sans-serif; /* Ensures Inter is used immediately */
+        margin: 0; /* Resets default body margin */
+        background-color: #f0f0f0; /* Base background color, subtly light */
+        scroll-behavior: smooth; /* Smooth scrolling for better user experience */
+      }
+    </style>
+</head>
+<body>
+    <!-- Message for users with JavaScript disabled -->
+    <noscript>You need to enable JavaScript to run this app. Please enable JavaScript to enjoy ZShop.</noscript>
+
+    <!-- The root HTML element where your entire React application will be mounted and rendered by index.js -->
+    <div id="root"></div>
+
+    <!-- In a production build, your bundled JavaScript (e.g., created by Webpack or Vite)
+         would typically be linked here: <script src="/static/js/main.chunk.js"></script> -->
+</body>
+</html>
+    
