@@ -231,14 +231,19 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
         has_exchange: false
       };
 
-      // Send to Yalidine backend
-      const yalidineResponse = await fetch('http://localhost:3001/api/yalidine-orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify([yalidineOrderData])
-      });
+      /// Send to Yalidine backend
+const yalidineResponse = await fetch(
+  process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:3001/api/yalidine-orders'
+    : 'https://zshop-yalidine-backend.herokuapp.com/api/yalidine-orders',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([yalidineOrderData])
+  }
+);
 
       const yalidineResult = await yalidineResponse.json();
       
