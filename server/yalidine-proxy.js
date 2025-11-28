@@ -10,7 +10,9 @@ app.use(cors({
     'https://zshop-a0b8c.firebaseapp.com',
     'https://vizoshop.up.railway.app',  // 🎯 YOUR RAILWAY FRONTEND
     'https://*.railway.app',            // 🎯 ALL RAILWAY DOMAINS
-    'https://*.railpack.app'            // 🎯 ALL RAILPACK DOMAINS
+    'https://*.railpack.app',
+   'https://vizofashion.com',  // 🆕 ADD YOUR CUSTOM DOMAIN
+    'https://www.vizofashion.com' // 🆕 ADD WWW VERSION TOO
   ],
   credentials: true
 }));
