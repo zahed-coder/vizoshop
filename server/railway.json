@@ -1,0 +1,16 @@
+{
+  "name": "zshop-yalidine-backend",
+  "version": "1.0.0",
+  "description": "Yalidine Proxy for ZShop",
+  "main": "yalidine-proxy.js",
+  "scripts": {
+    "start": "node yalidine-proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

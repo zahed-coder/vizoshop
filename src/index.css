@@ -1,211 +1,529 @@
 /* src/index.css */
 
-/* Import the Inter font from Google Fonts to ensure a modern and readable typeface across the site. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+/* Import Ultra Premium Luxury Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700,800,900&f[]=satoshi@400,500,600,700,800,900&display=swap');
+@import url('https://fonts.cdnfonts.com/css/neue-montreal');
 
-/* Tailwind CSS directives:
-   @tailwind base: Injects Tailwind's base styles, which normalize CSS and set up sensible defaults.
-   @tailwind components: Injects class names for custom components (if defined).
-   @tailwind utilities: Injects all of Tailwind's utility classes (e.g., for spacing, colors, flexbox).
-*/
+/* Tailwind CSS directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles for the entire body of the application */
-body {
-  /* Remove default browser margin to ensure the layout starts flush with the viewport edges. */
-  margin: 0;
-  /* Apply the 'Inter' font globally, with a fallback to generic sans-serif fonts. */
-  font-family: 'Inter', sans-serif;
-  /* Set a consistent background color to Soft Ivory Mist (#F2F0EF) for the entire page,
-     providing a clean, elegant base. */
-  background-color: #F0F2F5; /* Using the LightGrey from VizoColors for consistency */
-  /* Enable smooth scrolling behavior for a better user experience when navigating to anchor links. */
-  scroll-behavior: smooth;
-  /* Set the default text color to Deep Soul of the Ocean (#245F73) for excellent readability and richness. */
-  color: #333333; /* Using DarkText from VizoColors for consistency */
-  /* Enhance font rendering on WebKit and Mozilla browsers for smoother, sharper text. */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Premium Luxury Color Variables */
+:root {
+  --deep-matte-black: #000000;
+  --pure-white: #FFFFFF;
+  --electric-blue-start: #009DFF;
+  --electric-blue-end: #00FFE0;
+  --text-hover: rgba(255, 255, 255, 0.7);
+  --glass-white: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --blue-glow-intense: rgba(0, 157, 255, 0.4);
+  --ambient-mist: rgba(0, 157, 255, 0.03);
+  --cool-gray: #B0B0B0;
+  --platinum: #E5E5E5;
 }
 
-/* Custom Keyframe Animations for the Homepage Renaissance */
+/* Global Styles for the entire application - Luxury Futuristic Theme */
+body {
+  margin: 0;
+  font-family: 'Clash Display', 'Satoshi', 'Outfit', 'Neue Montreal', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--deep-matte-black);
+  color: var(--pure-white);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
 
-/* Animation for elements that slide up into view (used for hero text, etc.) */
+/* Premium Selection Styling */
+::selection {
+  background: var(--electric-blue-start);
+  color: var(--pure-white);
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: var(--electric-blue-start);
+  color: var(--pure-white);
+  text-shadow: none;
+}
+
+/* Premium Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--deep-matte-black);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--electric-blue-start), var(--electric-blue-end));
+  border-radius: 4px;
+  border: 1px solid var(--deep-matte-black);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--electric-blue-end), var(--electric-blue-start));
+  box-shadow: 0 0 20px var(--blue-glow-intense);
+}
+
+/* Premium Custom Keyframe Animations */
+
+/* Luxury Fade In Up Animation */
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 1s ease-out forwards; /* Adjusted duration for smoother effect */
+  animation: fade-in-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-/* Animation for the scroll indicator: a slow, gentle bounce */
+/* Luxury Bounce Animation */
 @keyframes bounceSlow {
   0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
 }
 
 .animate-bounce-slow {
-  animation: bounceSlow 2s infinite ease-in-out;
+  animation: bounceSlow 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animation for floating decorative elements: subtle, slow movement */
-@keyframes floatSlow {
+/* Luxury Floating Animation */
+@keyframes floatLuxury {
   0%, 100% {
-    transform: translateY(0px) translateX(0px);
+    transform: translateY(0px) translateX(0px) rotate(0deg);
   }
-  25% {
-    transform: translateY(-5px) translateX(5px);
+  33% {
+    transform: translateY(-20px) translateX(10px) rotate(1deg);
   }
-  50% {
-    transform: translateY(0px) translateX(0px);
-  }
-  75% {
-    transform: translateY(5px) translateX(-5px);
+  66% {
+    transform: translateY(10px) translateX(-5px) rotate(-1deg);
   }
 }
 
-.animate-float-slow {
-  animation: floatSlow 6s infinite ease-in-out;
+.animate-float-luxury {
+  animation: floatLuxury 8s infinite ease-in-out;
 }
 
-/* Animation for pulsing decorative elements: subtle scaling and opacity changes */
-@keyframes pulseSlow {
+/* Premium Pulse Animation */
+@keyframes pulseLuxury {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.1;
+    opacity: 0.8;
+    box-shadow: 0 0 20px var(--blue-glow-intense);
   }
   50% {
     transform: scale(1.05);
-    opacity: 0.25;
+    opacity: 1;
+    box-shadow: 0 0 40px var(--blue-glow-intense);
   }
 }
 
-.animate-pulse-slow {
-  animation: pulseSlow 4s infinite ease-in-out;
+.animate-pulse-luxury {
+  animation: pulseLuxury 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animation for decorative pinging elements: expanding and fading out */
-@keyframes pingSlow {
+/* Electric Glow Animation */
+@keyframes electricGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 157, 255, 0.3),
+                0 0 40px rgba(0, 157, 255, 0.1),
+                0 0 60px rgba(0, 157, 255, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 157, 255, 0.6),
+                0 0 60px rgba(0, 157, 255, 0.3),
+                0 0 90px rgba(0, 157, 255, 0.1);
+  }
+}
+
+.animate-electric-glow {
+  animation: electricGlow 3s infinite ease-in-out;
+}
+
+/* Gradient Shine Animation */
+@keyframes gradientShine {
   0% {
-    transform: scale(0.2);
-    opacity: 0.8;
+    background-position: -200% center;
   }
   100% {
-    transform: scale(1.2);
-    opacity: 0;
+    background-position: 200% center;
   }
 }
 
-.animate-ping-slow {
-  animation: pingSlow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+.animate-gradient-shine {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 157, 255, 0.2),
+    rgba(0, 255, 224, 0.1),
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  background-size: 200% auto;
+  animation: gradientShine 3s infinite linear;
 }
 
-/* Animation for spinning icons/elements */
-@keyframes spinSlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Premium Spin Animation */
+@keyframes spinLuxury {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.animate-spin-slow {
-  animation: spinSlow 5s linear infinite;
+.animate-spin-luxury {
+  animation: spinLuxury 8s linear infinite;
 }
 
-/* Custom text shadow for the hero title to give it more depth and presence. */
-.text-shadow-hero {
-  text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3), /* Deeper shadow for main text */
-               0px 0px 20px rgba(249, 249, 249, 0.5); /* Soft glow from OffWhite */
+/* Luxury Text Glow */
+.text-glow-electric {
+  text-shadow: 0 0 20px var(--electric-blue-start),
+               0 0 40px var(--electric-blue-start),
+               0 0 60px var(--electric-blue-start);
 }
 
-/* Custom shadow for elements that need extra depth, like the hero section and CTA. */
-.shadow-3xl {
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3),
-              0 10px 20px -5px rgba(0, 0, 0, 0.15);
+.text-glow-white {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+               0 0 40px rgba(255, 255, 255, 0.3),
+               0 0 60px rgba(255, 255, 255, 0.1);
 }
 
-/* No need for .text-shadow-md or specific ease functions here,
-   as they are directly handled by Tailwind or inline styles in HomePage.jsx for granular control. */
-
-/* Explicit Tailwind-like hover effects for elements if not fully covered by JIT mode or default config */
-/* Ensure these align with the HomePage.jsx logic where group-hover is used */
-.group:hover .group-hover\:scale-110 {
-  transform: scale(1.1);
-}
-.group:hover .group-hover\:scale-103 {
-  transform: scale(1.03);
-}
-.group:hover .group-hover\:-translate-y-2 {
-  transform: translateY(-8px);
-}
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
-}
-.group:hover .group-hover\:translate-x-full {
-  transform: translateX(0%); /* Corrected for the CTA button's swipe effect */
-}
-/* Add these to your global CSS file, e.g., src/index.css */
-
-/* For Product Detail Page Animations */
-@keyframes fade-in-quick {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-.animate-fade-in-quick {
-    animation: fade-in-quick 0.5s ease-out forwards;
+/* Premium Shadow System */
+.shadow-luxury {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+              0 5px 20px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-@keyframes slide-in-right {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-.animate-slide-in-right {
-    animation: slide-in-right 0.8s ease-out forwards;
+.shadow-glow-blue {
+  box-shadow: 0 0 20px var(--blue-glow-intense),
+              0 0 40px rgba(0, 157, 255, 0.2),
+              0 0 60px rgba(0, 157, 255, 0.1);
 }
 
-@keyframes button-confirm {
-    0% { transform: scale(1); background-color: #e66b3b; } /* AccentOrange */
-    50% { transform: scale(1.02); background-color: #4CAF50; } /* AccentGreen */
-    100% { transform: scale(1); background-color: #e66b3b; } /* AccentOrange */
-}
-.animate-button-confirm {
-    animation: button-confirm 1.5s ease-out forwards;
+.shadow-glass {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-/* Hotspot animation */
-@keyframes pulse-light {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-}
-.animate-pulse-light {
-    animation: pulse-light 2s infinite ease-in-out;
+.shadow-neumorphism {
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3),
+              -8px -8px 16px rgba(255, 255, 255, 0.03);
 }
 
-/* Custom Shadows (if not using Tailwind config extend) */
-.shadow-soft-3d {
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.08), 0px 2px 8px rgba(0, 0, 0, 0.05);
+/* Premium Gradient Text */
+.gradient-text-electric {
+  background: linear-gradient(135deg, var(--electric-blue-start), var(--electric-blue-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.shadow-inset-3d {
-    box-shadow: inset 0px 0px 20px rgba(0, 0, 0, 0.05), inset 0px 0px 5px rgba(0, 0, 0, 0.02);
+
+.gradient-text-luxury {
+  background: linear-gradient(135deg, var(--pure-white), var(--cool-gray));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.shadow-3xl-glow { /* For related products card hover */
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15),
-              0 5px 15px rgba(0,0,0,0.1),
-              0 0 30px rgba(230, 107, 59, 0.3); /* AccentOrange glow */
+
+/* Glass Morphism Effects */
+.glass-morphism {
+  background: var(--glass-white);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
 }
-.shadow-inner-soft {
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06), inset 0 -2px 4px rgba(0,0,0,0.03);
+
+.glass-morphism-intense {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Premium Border Gradients */
+.border-gradient-electric {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--deep-matte-black), var(--deep-matte-black)) padding-box,
+              linear-gradient(135deg, var(--electric-blue-start), var(--electric-blue-end)) border-box;
+}
+
+.border-gradient-luxury {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--deep-matte-black), var(--deep-matte-black)) padding-box,
+              linear-gradient(135deg, var(--pure-white), var(--cool-gray)) border-box;
+}
+
+/* Premium Custom Utilities */
+
+/* Luxury Focus States */
+.luxury-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--blue-glow-intense),
+              0 0 20px var(--blue-glow-intense);
+}
+
+/* Premium Hover Effects */
+.hover-glow:hover {
+  box-shadow: 0 0 30px var(--blue-glow-intense),
+              0 0 60px rgba(0, 157, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Premium Button Styles */
+.btn-luxury {
+  background: linear-gradient(135deg, var(--electric-blue-start), var(--electric-blue-end));
+  border: none;
+  color: var(--pure-white);
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+}
+
+.btn-luxury:hover::before {
+  left: 100%;
+}
+
+.btn-luxury:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 157, 255, 0.4);
+}
+
+.btn-luxury-secondary {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--pure-white);
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-luxury-secondary:hover {
+  border-color: var(--electric-blue-start);
+  background: rgba(0, 157, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 157, 255, 0.2);
+}
+
+/* Premium Input Styles */
+.input-luxury {
+  background: var(--glass-white);
+  border: 1px solid var(--glass-border);
+  color: var(--pure-white);
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 400;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.input-luxury:focus {
+  outline: none;
+  border-color: var(--electric-blue-start);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 157, 255, 0.2);
+}
+
+.input-luxury::placeholder {
+  color: var(--cool-gray);
+  font-weight: 300;
+}
+
+/* Premium Card Styles */
+.card-luxury {
+  background: var(--glass-white);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-luxury:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--electric-blue-start);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0, 157, 255, 0.2);
+}
+
+/* Premium Typography Scale */
+.text-luxury-display {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.text-luxury-title {
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.text-luxury-subtitle {
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  color: var(--cool-gray);
+}
+
+.text-luxury-body {
+  font-family: 'Satoshi', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  color: var(--platinum);
+}
+
+/* Premium Responsive Design */
+@media (max-width: 768px) {
+  .text-luxury-display {
+    font-size: 2.5rem;
+    letter-spacing: 0.03em;
+  }
+  
+  .text-luxury-title {
+    font-size: 1.75rem;
+    letter-spacing: 0.04em;
+  }
+  
+  .glass-morphism {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+}
+
+/* Premium Animation Delays */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-700 {
+  animation-delay: 700ms;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+/* Premium Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Premium Gradient Backgrounds */
+.bg-gradient-luxury {
+  background: linear-gradient(135deg, var(--deep-matte-black) 0%, #0a0a0a 50%, var(--deep-matte-black) 100%);
+}
+
+.bg-gradient-electric {
+  background: linear-gradient(135deg, var(--electric-blue-start) 0%, var(--electric-blue-end) 100%);
+}
+
+.bg-gradient-ambient {
+  background: radial-gradient(circle at 50% 50%, var(--ambient-mist) 0%, transparent 70%);
+}
+
+/* Ensure smooth transitions globally */
+* {
+  transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Premium Focus Visible for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Premium Print Styles */
+@media print {
+  .glass-morphism,
+  .glass-morphism-intense {
+    background: white;
+    backdrop-filter: none;
+    border: 1px solid #ccc;
+  }
+  
+  .gradient-text-electric,
+  .gradient-text-luxury {
+    background: none;
+    -webkit-text-fill-color: black;
+    color: black;
+  }
 }

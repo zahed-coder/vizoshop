@@ -1,489 +1,1149 @@
-import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
-import { CartContext } from '../context/CartContext';
-import { useLanguage } from '../context/LanguageContext'; // Assuming you have a LanguageContext
-import WilayaTownSelector from '../components/WilayaTownSelector'; // Import the new component
-
-// Firebase imports specific to CheckoutPage (for saving orders)
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import WilayaTownSelector from '../components/WilayaTownSelector';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useLocation } from 'react-router-dom';
+import { algeriaLocations, shippingPrices } from '../data/algeriaLocations'; // 🚀 MOVED TO SEPARATE FILE
 
-// --- Embedded Algerian Wilaya and Town Data (from WilayaTownSelector for consistency) ---
-// This data structure maps each Wilaya (Province) to its list of associated Towns/Communes.
-// We're bringing it here for easy access to define shipping costs based on wilaya.
-const algeriaLocations = [
-    { "wilaya": "Adrar", "towns": ["Adrar", "Tamest", "Reggane", "Bordj Badji Mokhtar", "Timimoun", "Aoulef", "Fenoughil", "Tinerkouk"] },
-    { "wilaya": "Chlef", "towns": ["Chlef", "El Karimia", "Ouled Fares", "Tenes", "Boukadir", "Sobha", "Oued Fodda", "Ain Merane"] },
-    { "wilaya": "Laghouat", "towns": ["Laghouat", "Aflou", "Ksar El Hirane", "Ain Madhi", "Guelt Es Stell"] },
-    { "wilaya": "Oum El Bouaghi", "towns": ["Oum El Bouaghi", "Ain Beida", "Ain M'lila", "Ain Fakroun", "Meskhiana"] },
-    { "wilaya": "Batna", "towns": ["Batna", "Barika", "Arris", "Merouana", "Ain Touta", "Tazoult", "Djezzar"] },
-    { "wilaya": "Béjaïa", "towns": ["Béjaïa", "Akbou", "Amizour", "Kherrata", "El Kseur", "Sidi Aïch", "Tichy"] },
-    { "wilaya": "Biskra", "towns": ["Biskra", "Ouled Djellal", "Sidi Okba", "Tolga", "Foughala", "El Kantara"] },
-    { "wilaya": "Béchar", "towns": ["Béchar", "Abadla", "Beni Ounif", "Taghit", "Lahmar"] },
-    { "wilaya": "Blida", "towns": ["Blida", "Boufarik", "Larbaa", "Meftah", "Mouzaia", "Oued El Alleug"] },
-    { "wilaya": "Bouira", "towns": ["Bouira", "Lakhdaria", "Sour El Ghozlane", "Ain Bessem", "El Hachimia"] },
-    { "wilaya": "Tamanrasset", "towns": ["Tamanrasset", "Abalessa", "Tazrouk", "Idles", "Tin Zaouatine"] },
-    { "wilaya": "Tébessa", "towns": ["Tébessa", "Bir El Ater", "Cheria", "Ouenza", "El Ma Labiodh"] },
-    { "wilaya": "Tlemcen", "towns": ["Tlemcen", "Ghazaouet", "Maghnia", "Remchi", "Sebdou", "Hennaya"] },
-    { "wilaya": "Tiaret", "towns": ["Tiaret", "Frenda", "Ain Deheb", "Sougueur", "Mahdia"] },
-    { "wilaya": "Tizi Ouzou", "towns": ["Tizi Ouzou", "Ain El Hammam", "Azazga", "Bouzeguene", "Draâ Ben Khedda"] },
-    { "wilaya": "Alger", "towns": ["Alger Centre", "Bab Ezzouar", "Bir Mourad Raïs", "Chéraga", "Dar El Beïda", "Hussein Dey", "Rouïba"] },
-    { "wilaya": "Djelfa", "towns": ["Djelfa", "Ain Oussara", "Messaad", "Charef", "Dar Chioukh"] },
-    { "wilaya": "Jijel", "towns": ["Jijel", "Taher", "El Milia", "Chekfa", "Ziamah"] },
-    { "wilaya": "Sétif", "towns": ["Sétif", "El Eulma", "Bousselam", "Ain Oulmene", "Mezloug", "Beni Ouartilane"] },
-    { "wilaya": "Saïda", "towns": ["Saïda", "Ain El Hadjar", "Sidi Boubkeur", "Youb"] },
-    { "wilaya": "Skikda", "towns": ["Skikda", "Ramdane Djamel", "El Harrouch", "Azzaba", "Collo"] },
-    { "wilaya": "Sidi Bel Abbès", "towns": ["Sidi Bel Abbès", "Ras El Ma", "Sfisef", "Telagh", "Ain El Berd"] },
-    { "wilaya": "Annaba", "towns": ["Annaba", "El Bouni", "Sidi Amar", "Chetaïbi", "Berrahal"] },
-    { "wilaya": "Guelma", "towns": ["Guelma", "Héliopolis", "Oued Zenati", "Bouchegouf", "Khezaras"] },
-    { "wilaya": "Constantine", "towns": ["Constantine", "El Khroub", "Ain Smara", "Hamma Bouziane", "Didouche Mourad"] },
-    { "wilaya": "Médéa", "towns": ["Médéa", "Berrouaghia", "Ksar Boukhari", "Chahbounia", "Tablat"] },
-    { "wilaya": "Mostaganem", "towns": ["Mostaganem", "Hassi Mameche", "Ain Tedles", "Mesra", "Bouguirat"] },
-    { "wilaya": "M'Sila", "towns": ["M'Sila", "Bou Saada", "Magra", "Sidi Aïssa", "Ouled Derradj"] },
-    { "wilaya": "Mascara", "towns": ["Mascara", "Mohammadia", "Sig", "Tighenif", "Ghriss"] },
-    { "wilaya": "Ouargla", "towns": ["Ouargla", "Touggourt", "Hassi Messaoud", "Rouissat", "Nezla"] },
-    { "wilaya": "Oran", "towns": ["Oran", "Arzew", "Bir El Djir", "Es Senia", "Gdyel", "Hassi Bounif", "Mers El Kébir"] },
-    { "wilaya": "El Bayadh", "towns": ["El Bayadh", "Bougtob", "Chellala", "Brezina", "Rogassa"] },
-    { "wilaya": "Illizi", "towns": ["Illizi", "Djanet", "Debdeb", "Bordj Omar Driss"] },
-    { "wilaya": "Bordj Bou Arréridj", "towns": ["Bordj Bou Arréridj", "Ras El Oued", "Ain Taghrout", "Mansoura", "Bordj Ghedir"] },
-    { "wilaya": "Boumerdès", "towns": ["Boumerdès", "Dellys", "Boudouaou", "Khemis El Khechna", "Thenia"] },
-    { "wilaya": "El Tarf", "towns": ["El Tarf", "El Kala", "Ben M'hidi", "Drean", "Bouteldja"] },
-    { "wilaya": "Tindouf", "towns": ["Tindouf", "Oum El Assel"] },
-    { "wilaya": "Tissemsilt", "towns": ["Tissemsilt", "Theniet El Had", "Bordj Bounaama", "Lardjem"] },
-    { "wilaya": "El Oued", "towns": ["El Oued", "Guemar", "Debila", "Robbah", "Magrane"] },
-    { "wilaya": "Khenchela", "towns": ["Khenchela", "Chechar", "Ain Touila", "Kaïs", "Babar"] },
-    { "wilaya": "Souk Ahras", "towns": ["Souk Ahras", "Sedrata", "Taoura", "M'daourouch", "Haddada"] },
-    { "wilaya": "Tipaza", "towns": ["Tipaza", "Cherchell", "Fouka", "Hadjeret Ennous", "Kolea", "Staoueli"] },
-    { "wilaya": "Mila", "towns": ["Mila", "Chelghoum Laïd", "Grarem Gouga", "Tadjenanet", "Rouached"] },
-    { "wilaya": "Aïn Defla", "towns": ["Aïn Defla", "Khemis Miliana", "El Attaf", "Miliana", "Boumedfaa"] },
-    { "wilaya": "Naâma", "towns": ["Naâma", "Mecheria", "Ain Sefra", "Tiout", "Moghrar"] },
-    { "wilaya": "Ain Témouchent", "towns": ["Ain Témouchent", "Hammam Bou Hadjar", "Beni Saf", "El Amria", "Ain Kihal"] },
-    { "wilaya": "Ghardaïa", "towns": ["Ghardaïa", "El Atteuf", "Berriane", "Daya Ben Dahoua", "Metlili"] },
-    { "wilaya": "Relizane", "towns": ["Relizane", "Oued Rhiou", "Mazouna", "Zemoura", "Ain Rahma"] }
-];
-
-
-// VIZO color palette for consistency
-const VizoColors = {
-  PrimaryDark: '#1A2A3A',
-  AccentOrange: '#E66B3B',
-  LightText: '#FFFFFF',
-  DarkText: '#333333', // Adjusted for better contrast on light backgrounds
-  NeutralBlue: '#6A8DAD',
-  OffWhite: '#F9F9F9',
-  GradientPurple: '#9D50BB',
-  GradientYellow: '#F2D50F',
-  SoftHighlight: '#A0AEC0'
+// Premium Luxury Color Palette (Same as other pages)
+const PremiumColors = {
+  DeepMatteBlack: '#000000',
+  PureWhite: '#FFFFFF',
+  ElectricBlueStart: '#009DFF',
+  ElectricBlueEnd: '#00FFE0',
+  TextHover: 'rgba(255, 255, 255, 0.7)',
+  GlassWhite: 'rgba(255, 255, 255, 0.05)',
+  GlassBorder: 'rgba(255, 255, 255, 0.08)',
+  BlueGlowIntense: 'rgba(0, 157, 255, 0.4)',
+  AmbientMist: 'rgba(0, 157, 255, 0.03)',
+  CoolGray: '#B0B0B0',
+  Platinum: '#E5E5E5',
+  MetallicGray: '#1A1A1A',
+  InputText: '#FFFFFF', // 🆕 ADDED: Bright white for input text
+  PlaceholderText: 'rgba(255, 255, 255, 0.5)', // 🆕 ADDED: Visible placeholder
 };
 
-// Helper function to format currency as DZD
 const formatCurrency = (amount) => {
-    return `${parseFloat(amount).toFixed(2)} DZD`; // Ensure it's a float and display 2 decimal places
+  return `${parseFloat(amount).toFixed(2)} DZD`;
 };
 
-/**
- * CheckoutPage Component
- * This component guides the user through the final steps of the purchase,
- * displaying a summary of selected items, collecting customer information,
- * and processing the order. It features interactive forms, validation,
- * and a clear call to action.
- *
- * @param {object} props - The component's properties.
- * @param {Array<object>} props.selectedItems - An array of cart items chosen for checkout.
- * @param {function(object): void} props.onPlaceOrder - Callback to handle the order placement logic (in App.js).
- * @param {function(): void} props.onClearCart - Callback to clear the cart after a successful order.
- * @param {function(string, any?): void} props.onNavigate - Callback function to handle page navigation.
- * @param {object} props.db - The Firestore database instance.
- * @param {object} props.auth - The Firebase Auth instance.
- * @param {string} props.appId - The application ID used in Firestore collection paths.
- */
-const CheckoutPage = ({ selectedItems, onPlaceOrder, onClearCart, onNavigate, db, auth, appId }) => {
-  // --- State Management for Form Data ---
+const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigate, db, auth, appId }) => {
+  const location = useLocation();
   const [customerInfo, setCustomerInfo] = useState({
     fullName: '',
-    email: '',
-    phone: '',
+    phone: '+213 ',
     address: '',
     town: '',
-    wilaya: '', // Represents a province/state in Algeria
+    wilaya: '',
   });
-  const [formErrors, setFormErrors] = useState({}); // Stores validation errors for form fields.
-  const [isSubmitting, setIsSubmitting] = useState(false); // Controls loading state for form submission.
-  const [isOrderPlaced, setIsOrderPlaced] = useState(false); // Tracks if an order has been successfully placed.
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const [deliveryMethod, setDeliveryMethod] = useState('home');
 
-  // State for dynamic shipping cost based on selected Wilaya
-  const [shippingCost, setShippingCost] = useState(0); // Initial shipping cost
-
-  const { t } = useLanguage(); // For internationalization
-
-  // --- Derived State/Calculations ---
-  // Calculate the total price of all selected items.
-  const subtotal = useMemo(() =>
-    selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-    [selectedItems]
-  );
-  const totalAmount = subtotal + shippingCost; // Final total for the order.
-
-  // --- Shipping Cost Logic (Dynamic based on Wilaya) ---
+  const directPurchaseData = location.state?.directPurchase ? location.state : null;
+  
+  // 🚀 Check backend connection
   useEffect(() => {
-    let calculatedCost = 0;
-    const selectedWilayaData = algeriaLocations.find(loc => loc.wilaya === customerInfo.wilaya);
+    // Test backend connection on component mount
+    fetch('http://localhost:3001/api/health')
+      .then(res => res.json())
+      .then(data => console.log('✅ Backend connection:', data))
+      .catch(err => console.error('❌ Backend not running:', err));
+  }, []);
 
-    if (customerInfo.wilaya) {
-      // Example dynamic shipping costs:
-      if (customerInfo.wilaya === "Blida" || customerInfo.wilaya === "Alger") {
-        calculatedCost = 500; // Local rate
-      } else if (selectedWilayaData && ["Oran", "Constantine", "Sétif"].includes(customerInfo.wilaya)) {
-        calculatedCost = 700; // Regional rate
-      } else if (selectedWilayaData) {
-        calculatedCost = 1000; // Further wilayas
-      }
+  // 🚀 FIX: Optimized items processing with proper memoization
+  const itemsToProcess = useMemo(() => {
+    if (directPurchaseData) {
+      const directPurchaseItem = {
+        ...directPurchaseData.product,
+        quantity: directPurchaseData.quantity,
+        id: directPurchaseData.product.id || `direct-${Date.now()}`,
+        isSelected: true,
+        name: directPurchaseData.product.displayName || directPurchaseData.product.name,
+        price: directPurchaseData.product.finalPrice || directPurchaseData.product.price,
+        imageUrl: directPurchaseData.product.imageUrl || (directPurchaseData.product.images && directPurchaseData.product.images[0])
+      };
+      return [directPurchaseItem];
     }
-    setShippingCost(calculatedCost);
-  }, [customerInfo.wilaya]); // Recalculate when selected wilaya changes
+    return Array.isArray(selectedItems) ? selectedItems : [];
+  }, [selectedItems, directPurchaseData]);
 
-  // --- Form Validation Logic (Memoized) ---
+  // 🚀 FIX: Optimized calculations with proper memoization
+  const subtotal = useMemo(() =>
+    itemsToProcess.reduce((acc, item) => acc + item.price * item.quantity, 0),
+    [itemsToProcess]
+  );
+
+  // 🚀 CRITICAL FIX: Memoized shipping cost calculation instead of useEffect
+  const shippingCost = useMemo(() => {
+    if (!customerInfo.wilaya) return 0;
+    
+    const prices = shippingPrices[customerInfo.wilaya];
+    return prices ? prices[deliveryMethod] : 0;
+  }, [customerInfo.wilaya, deliveryMethod]);
+
+  const totalAmount = subtotal + shippingCost;
+
+  // 🚀 FIX: Optimized form validation with useCallback
   const validateForm = useCallback(() => {
     const errors = {};
-    if (!customerInfo.fullName.trim()) errors.fullName = t('checkout.errors.fullNameRequired');
-    if (!customerInfo.email.trim()) {
-      errors.email = t('checkout.errors.emailRequired');
-    } else if (!/\S+@\S+\.\S+/.test(customerInfo.email)) {
-      errors.email = t('checkout.errors.emailInvalid');
-    }
+    if (!customerInfo.fullName.trim()) errors.fullName = 'Full name is required';
+    
+    const phoneRegex = /^\+213\s?0?[5-7][0-9]{8}$/;
+    
     if (!customerInfo.phone.trim()) {
-      errors.phone = t('checkout.errors.phoneRequired');
-    } else if (!/^\+?[0-9]{8,15}$/.test(customerInfo.phone)) {
-      errors.phone = t('checkout.errors.phoneInvalid');
+      errors.phone = 'Phone number is required';
+    } else {
+      const normalizedPhone = customerInfo.phone.replace(/\s/g, '');
+      if (!phoneRegex.test(normalizedPhone)) {
+        errors.phone = 'Invalid phone number (must start with +213 followed by 9 or 10 digits)';
+      }
     }
-    if (!customerInfo.address.trim()) errors.address = t('checkout.errors.addressRequired');
-    if (!customerInfo.town.trim()) errors.town = t('checkout.errors.townRequired');
-    if (!customerInfo.wilaya.trim()) errors.wilaya = t('checkout.errors.wilayaRequired');
+    
+    if (!customerInfo.address.trim() && deliveryMethod === 'home') errors.address = 'Address is required for home delivery';
+    if (!customerInfo.town.trim()) errors.town = 'Town is required';
+    if (!customerInfo.wilaya.trim()) errors.wilaya = 'Wilaya is required';
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  }, [customerInfo, t]); // Add 't' to dependencies for i18n
+  }, [customerInfo, deliveryMethod]);
 
-  // --- Event Handlers ---
-
-  /**
-   * Handles changes in the customer information form fields.
-   * Updates the `customerInfo` state and clears any related validation errors.
-   * This is a generic handler for all text inputs.
-   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>} e - The change event object.
-   */
+  // 🚀 FIX: Optimized input handlers with useCallback
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setCustomerInfo(prevInfo => ({ ...prevInfo, [name]: value }));
-    setFormErrors(prevErrors => ({ ...prevErrors, [name]: '' })); // Clear error on input change.
+    setFormErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   }, []);
 
-  /**
-   * Handles changes specifically for the Wilaya field from WilayaTownSelector.
-   * @param {string} wilaya - The new wilaya value.
-   */
   const handleWilayaChange = useCallback((wilaya) => {
-    setCustomerInfo(prevInfo => ({ ...prevInfo, wilaya: wilaya, town: '' })); // Clear town when wilaya changes
+    setCustomerInfo(prevInfo => ({ ...prevInfo, wilaya: wilaya, town: '' }));
     setFormErrors(prevErrors => ({ ...prevErrors, wilaya: '' }));
   }, []);
 
-  /**
-   * Handles changes specifically for the Town field from WilayaTownSelector.
-   * @param {string} town - The new town value.
-   */
   const handleTownChange = useCallback((town) => {
     setCustomerInfo(prevInfo => ({ ...prevInfo, town: town }));
     setFormErrors(prevErrors => ({ ...prevErrors, town: '' }));
   }, []);
+  
+  const handlePhoneChange = useCallback((e) => {
+    let value = e.target.value;
+    const prefix = '+213 ';
 
+    if (!value.startsWith(prefix)) {
+      const digits = value.replace(/[^0-9]/g, '');
+      value = prefix + digits;
+    } else {
+      value = prefix + value.substring(prefix.length).replace(/[^0-9]/g, '');
+    }
 
-  /**
-   * Handles the "Place Order" button click.
-   * Performs form validation, constructs the order object, and calls `onPlaceOrder` prop.
-   * @param {React.FormEvent} e - The form submission event.
-   */
+    const digitsOnly = value.substring(prefix.length).replace(/[^0-9]/g, '');
+    const maxDigits = 10;
+    
+    if (digitsOnly.length > maxDigits) {
+      value = prefix + digitsOnly.substring(0, maxDigits);
+    }
+
+    setCustomerInfo(prevInfo => ({ ...prevInfo, phone: value }));
+    setFormErrors(prevErrors => ({ ...prevErrors, phone: '' }));
+  }, []);
+
+  const handleDeliveryMethodChange = useCallback((e) => {
+    setDeliveryMethod(e.target.value);
+    if (e.target.value === 'yalidine') {
+      setFormErrors(prevErrors => ({ ...prevErrors, address: '' }));
+    }
+  }, []);
+
+  // 🚀 FIX: UPDATED order submission with Yalidine integration
   const handleSubmitOrder = useCallback(async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior (page reload).
-
-    if (!validateForm()) {
-      console.error(t('checkout.validationFailed'));
-      // Optionally scroll to the first error or show a summary message.
+    e.preventDefault();
+    if (!auth?.currentUser) {
+      alert('Please log in first');
+      onNavigate('login');
       return;
+    }
+
+    if (!validateForm()) return;
+    
+    if (itemsToProcess.length === 0) {
+        alert('No items in cart to place order.');
+        return;
     }
 
     if (!db || !auth || !auth.currentUser || !appId) {
-      console.error(t('checkout.firebaseInitError'));
-      alert(t('checkout.connectionErrorAlert'));
+      alert('Connection error. Please try again later');
       return;
     }
 
-    setIsSubmitting(true); // Set submitting state to true (for loading indicator).
+    setIsSubmitting(true);
 
     const orderData = {
-      customerInfo: customerInfo,
-      items: selectedItems.map(item => ({
+      customerInfo: { ...customerInfo, deliveryMethod: deliveryMethod },
+      items: itemsToProcess.map(item => ({
         id: item.id,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
         imageUrl: item.imageUrl,
+        size: item.size || null,
+        isDirectPurchase: !!directPurchaseData,
       })),
       summary: {
         subtotal: subtotal,
         shipping: shippingCost,
         total: totalAmount,
       },
-      userId: auth.currentUser.uid, // User ID of the person placing the order
-      placedAt: serverTimestamp(), // Use serverTimestamp for precise server-side timestamp
-      orderStatus: 'Pending Call', // Initial status for new orders
+      userId: auth.currentUser.uid,
+      placedAt: serverTimestamp(),
+      orderStatus: 'Pending',
+      orderSource: directPurchaseData ? 'direct_purchase' : 'cart',
     };
 
     try {
-      // Firestore path: artifacts/{appId}/public/data/orders
+      // 1. First save to Firebase
       const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
       await addDoc(ordersCollectionRef, orderData);
-      console.log(t('checkout.orderPlacedSuccessConsole'));
-      setIsOrderPlaced(true); // Indicate success.
-      onPlaceOrder(orderData); // Call parent's callback with order details.
-      onClearCart(); // Clear the cart after successful order.
-      setIsSubmitting(false); // Reset submitting state after success
+      
+      // 2. 🆕 SEND TO YALIDINE
+      console.log('📦 Sending order to Yalidine...');
+      
+      const yalidineOrderData = {
+        order_id: `order_${Date.now()}_${auth.currentUser.uid.substring(0, 8)}`,
+        from_wilaya_name: "Alger", // Your location
+        firstname: customerInfo.fullName.split(' ')[0] || customerInfo.fullName,
+        familyname: customerInfo.fullName.split(' ').slice(1).join(' ') || "",
+        contact_phone: customerInfo.phone,
+        address: customerInfo.address || "Not specified",
+        to_commune_name: customerInfo.town,
+        to_wilaya_name: customerInfo.wilaya,
+        product_list: itemsToProcess.map(item => 
+          `${item.quantity}x ${item.name}${item.size ? ` (${item.size})` : ''}`
+        ).join(', '),
+        price: totalAmount,
+        do_insurance: true,
+        declared_value: totalAmount,
+        height: 10,
+        width: 20,
+        length: 30,
+        weight: Math.max(1, itemsToProcess.length * 0.3), // Estimate weight
+        freeshipping: false,
+        is_stopdesk: deliveryMethod === 'yalidine',
+        has_exchange: false
+      };
+
+      // Send to Yalidine backend
+      const yalidineResponse = await fetch('http://localhost:3001/api/yalidine-orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify([yalidineOrderData])
+      });
+
+      const yalidineResult = await yalidineResponse.json();
+      
+      if (yalidineResult[yalidineOrderData.order_id]?.success) {
+        console.log('✅ Yalidine shipment created:', yalidineResult[yalidineOrderData.order_id]);
+        
+        // Show success with tracking info
+        alert(`🎉 Order placed successfully!\n📦 Tracking: ${yalidineResult[yalidineOrderData.order_id].tracking}\n📋 Label: ${yalidineResult[yalidineOrderData.order_id].label}`);
+      } else {
+        console.warn('⚠️ Yalidine creation failed:', yalidineResult[yalidineOrderData.order_id]?.message);
+        alert('✅ Order saved locally, but Yalidine shipment failed. Check console for details.');
+      }
+
+      // 3. Show success and cleanup
+      setIsOrderPlaced(true);
+      onPlaceOrder(orderData);
+      
+      if (!directPurchaseData) {
+        onClearCart();
+      }
+      
+      setIsSubmitting(false);
+      
     } catch (error) {
-      console.error(t('checkout.orderPlacementErrorConsole'), error);
-      alert(`${t('checkout.orderPlacementErrorAlert')} ${error.message}`); // Show error to user.
-      setIsSubmitting(false); // Reset submitting state on error.
-      setIsOrderPlaced(false); // Ensure order placed state is false on error.
+      console.error('Failed to place order:', error);
+      
+      // Check if it's a Yalidine error or Firebase error
+      if (error.message.includes('Yalidine') || error.message.includes('localhost:3001')) {
+        alert('✅ Order saved to database, but Yalidine shipment failed. Check console for details.');
+        setIsOrderPlaced(true); // Still mark as placed since Firebase worked
+        onPlaceOrder(orderData);
+        if (!directPurchaseData) {
+          onClearCart();
+        }
+      } else {
+        alert(`❌ Failed to place order: ${error.message}`);
+        setIsOrderPlaced(false);
+      }
+      
+      setIsSubmitting(false);
     }
-  }, [customerInfo, selectedItems, subtotal, shippingCost, totalAmount, validateForm, onPlaceOrder, onClearCart, db, auth, appId, t]);
+  }, [
+    customerInfo, 
+    itemsToProcess, 
+    subtotal, 
+    shippingCost, 
+    totalAmount, 
+    validateForm, 
+    onPlaceOrder, 
+    onClearCart, 
+    db, 
+    auth, 
+    appId, 
+    onNavigate, 
+    deliveryMethod, 
+    directPurchaseData
+  ]);
 
-  // --- Render Sections ---
+  // 🚀 FIX: Memoized order summary component
+  const renderOrderSummary = useMemo(() => (
+    <div className="luxury-summary-container">
+      <div className="luxury-card-border">
+        <div className="luxury-metallic-edge"></div>
+      </div>
+      
+      <div className="luxury-summary-content">
+        <h3 className="luxury-summary-title">
+          {directPurchaseData ? 'DIRECT PURCHASE SUMMARY' : 'ORDER SUMMARY'}
+        </h3>
+        <div className="luxury-title-underline"></div>
 
-  /**
-   * Renders the order summary section.
-   */
-  const renderOrderSummary = () => (
-    <div className={`bg-[${VizoColors.OffWhite}] p-6 rounded-xl shadow-lg border border-[${VizoColors.SoftHighlight}]/50 animate-fade-in-up md:sticky md:top-24`}>
-      <h3 className={`text-2xl font-bold text-[${VizoColors.PrimaryDark}] mb-4 border-b pb-3 border-[${VizoColors.SoftHighlight}]/30`}>
-        {t('checkout.orderSummaryTitle')}
-      </h3>
-      <div className={`space-y-3 text-[${VizoColors.NeutralBlue}]`}>
-        {selectedItems.map((item) => (
-          <div key={item.id} className="flex justify-between items-center text-lg">
-            <span className={`font-medium line-clamp-1 flex-grow pr-2 text-[${VizoColors.DarkText}]`}>{item.name} (x{item.quantity})</span>
-            <span className={`font-semibold text-[${VizoColors.PrimaryDark}]`}>{formatCurrency(item.price * item.quantity)}</span>
+        <div className="luxury-items-list">
+          {itemsToProcess.map((item) => (
+            <div key={item.id} className="luxury-item-row">
+              <div className="luxury-item-info">
+                <span className="luxury-item-name">{item.name}</span>
+                <div className="luxury-item-details">
+                  {item.size && (
+                    <span className="luxury-item-size">{item.size}</span>
+                  )}
+                  <span className="luxury-item-quantity">x{item.quantity}</span>
+                </div>
+              </div>
+              <span className="luxury-item-price">
+                {formatCurrency(item.price * item.quantity)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="luxury-summary-totals">
+          <div className="luxury-total-row">
+            <span>Subtotal:</span>
+            <span className="luxury-total-amount">{formatCurrency(subtotal)}</span>
           </div>
-        ))}
-        <div className={`pt-3 border-t border-[${VizoColors.SoftHighlight}]/30 text-lg`}>
-          <div className="flex justify-between py-1">
-            <span>{t('checkout.subtotal')}:</span>
-            <span className={`font-semibold text-[${VizoColors.DarkText}]`}>{formatCurrency(subtotal)}</span>
-          </div>
-          <div className="flex justify-between py-1">
-            <span>{t('checkout.shipping')}:</span>
-            <span className={`font-semibold text-[${VizoColors.DarkText}]`}>
-              {customerInfo.wilaya ? formatCurrency(shippingCost) : t('checkout.selectWilayaForShipping')}
+          <div className="luxury-total-row">
+            <span>Shipping ({deliveryMethod === 'home' ? 'Home Delivery' : 'Pickup Point'}):</span>
+            <span className="luxury-total-amount">
+              {customerInfo.wilaya ? formatCurrency(shippingCost) : 'Select Wilaya & Shipping'}
             </span>
           </div>
-          <div className={`flex justify-between items-center pt-3 border-t border-dashed border-[${VizoColors.SoftHighlight}]/50 text-xl font-bold text-[${VizoColors.PrimaryDark}]`}>
-            <span>{t('checkout.total')}:</span>
-            <span className={`text-[${VizoColors.AccentOrange}] text-3xl`}>{formatCurrency(totalAmount)}</span>
+          <div className="luxury-total-final">
+            <span>TOTAL AMOUNT:</span>
+            <span className="luxury-final-price">{formatCurrency(totalAmount)}</span>
           </div>
         </div>
       </div>
     </div>
-  );
+  ), [
+    itemsToProcess, 
+    subtotal, 
+    shippingCost, 
+    totalAmount, 
+    customerInfo.wilaya, 
+    deliveryMethod, 
+    directPurchaseData
+  ]);
 
-  /**
-   * Renders the customer information form.
-   */
-  const renderCustomerInfoForm = () => (
-    <form onSubmit={handleSubmitOrder} className={`bg-[${VizoColors.OffWhite}] p-6 md:p-8 rounded-xl shadow-xl border border-[${VizoColors.SoftHighlight}]/50 animate-fade-in-up delay-100`}>
-      <h3 className={`text-2xl font-bold text-[${VizoColors.PrimaryDark}] mb-6 border-b pb-3 border-[${VizoColors.SoftHighlight}]/30`}>
-        {t('checkout.shippingInformationTitle')}
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Full Name */}
-        <div>
-          <label htmlFor="fullName" className={`block text-sm font-medium text-[${VizoColors.DarkText}] mb-2`}>{t('checkout.fullNameLabel')}</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={customerInfo.fullName}
-            onChange={handleInputChange}
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-[${VizoColors.AccentOrange}] focus:border-transparent transition-all duration-200 ${formErrors.fullName ? 'border-red-500' : 'border-gray-300'}`}
-            placeholder={t('checkout.fullNamePlaceholder')}
-          />
-          {formErrors.fullName && <p className="text-red-500 text-sm mt-1">{formErrors.fullName}</p>}
-        </div>
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className={`block text-sm font-medium text-[${VizoColors.DarkText}] mb-2`}>{t('checkout.emailLabel')}</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={customerInfo.email}
-            onChange={handleInputChange}
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-[${VizoColors.AccentOrange}] focus:border-transparent transition-all duration-200 ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
-            placeholder={t('checkout.emailPlaceholder')}
-          />
-          {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
-        </div>
-        {/* Phone Number */}
-        <div className="md:col-span-2">
-          <label htmlFor="phone" className={`block text-sm font-medium text-[${VizoColors.DarkText}] mb-2`}>{t('checkout.phoneLabel')}</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={customerInfo.phone}
-            onChange={handleInputChange}
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-[${VizoColors.AccentOrange}] focus:border-transparent transition-all duration-200 ${formErrors.phone ? 'border-red-500' : 'border-gray-300'}`}
-            placeholder={t('checkout.phonePlaceholder')}
-          />
-          {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
-        </div>
-        {/* Address */}
-        <div className="md:col-span-2">
-          <label htmlFor="address" className={`block text-sm font-medium text-[${VizoColors.DarkText}] mb-2`}>{t('checkout.addressLabel')}</label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={customerInfo.address}
-            onChange={handleInputChange}
-            className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-[${VizoColors.AccentOrange}] focus:border-transparent transition-all duration-200 ${formErrors.address ? 'border-red-500' : 'border-gray-300'}`}
-            placeholder={t('checkout.addressPlaceholder')}
-          />
-          {formErrors.address && <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>}
-        </div>
-
-        {/* Wilaya and Town Selectors (using WilayaTownSelector component) */}
-        <WilayaTownSelector
-          selectedWilaya={customerInfo.wilaya}
-          selectedTown={customerInfo.town}
-          onWilayaChange={handleWilayaChange}
-          onTownChange={handleTownChange}
-          wilayaError={formErrors.wilaya}
-          townError={formErrors.town}
-          locations={algeriaLocations} // Pass the locations data
-          VizoColors={VizoColors} // Pass VizoColors for internal styling consistency
-        />
-
+  // 🚀 FIX: Memoized customer info form component
+  const renderCustomerInfoForm = useMemo(() => (
+    <div className="luxury-form-container">
+      <div className="luxury-card-border">
+        <div className="luxury-metallic-edge"></div>
       </div>
-      {/* Place Order Button */}
-      <div className="mt-8 text-center">
-        <button
-          type="submit"
-          className={`
-            bg-[${VizoColors.PrimaryDark}] text-[${VizoColors.LightText}] 
-            px-10 py-4 rounded-full text-xl font-bold shadow-xl
-            hover:bg-[${VizoColors.AccentOrange}] hover:shadow-2xl 
-            transition-all duration-300 transform hover:scale-105
-            focus:outline-none focus:ring-4 focus:ring-[${VizoColors.SoftHighlight}]/50
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md
-            flex items-center justify-center mx-auto
-          `}
-          disabled={isSubmitting || selectedItems.length === 0 || isOrderPlaced} // Disable if submitting or no items or order placed
-          aria-label={t('checkout.placeOrderButtonLabel')}
-        >
-          {isSubmitting ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {t('checkout.placingOrder')}
-            </>
-          ) : isOrderPlaced ? (
-            t('checkout.orderPlacedSuccessButton')
-          ) : (
-            `${t('checkout.placeOrderButton')} (${formatCurrency(totalAmount)})`
-          )}
-        </button>
-        {isOrderPlaced && (
-          <p className={`mt-4 text-green-600 font-semibold text-lg animate-fade-in`}>
-            {t('checkout.orderPlacedThankYou')}
-          </p>
-        )}
-      </div>
-    </form>
-  );
 
-  // --- Main Render Logic ---
-  if (selectedItems.length === 0 && !isOrderPlaced) {
+      <div className="luxury-form-content">
+        <h3 className="luxury-form-title">SHIPPING INFORMATION</h3>
+        <div className="luxury-title-underline"></div>
+
+        <form onSubmit={handleSubmitOrder} className="luxury-form">
+          <div className="luxury-form-grid">
+            {/* Full Name */}
+            <div className="luxury-form-group luxury-full-width">
+              <label className="luxury-form-label">FULL NAME</label>
+              <input
+                type="text"
+                name="fullName"
+                value={customerInfo.fullName}
+                onChange={handleInputChange}
+                className={`luxury-form-input ${formErrors.fullName ? 'luxury-input-error' : ''}`}
+                placeholder="Enter your full name"
+              />
+              {formErrors.fullName && <span className="luxury-error-message">{formErrors.fullName}</span>}
+            </div>
+
+            {/* Phone Number */}
+            <div className="luxury-form-group luxury-full-width">
+              <label className="luxury-form-label">PHONE NUMBER</label>
+              <div className="luxury-phone-input-container">
+                <input
+                  type="tel"
+                  name="phone"
+                  value={customerInfo.phone}
+                  onChange={handlePhoneChange}
+                  className={`luxury-form-input luxury-phone-input ${formErrors.phone ? 'luxury-input-error' : ''}`}
+                  placeholder="5XX XXX XXX or 05XXXXXXXX"
+                />
+                <span className="luxury-phone-prefix">+213</span>
+              </div>
+              {formErrors.phone && <span className="luxury-error-message">{formErrors.phone}</span>}
+            </div>
+
+            {/* Delivery Method */}
+            <div className="luxury-form-group luxury-full-width">
+              <label className="luxury-form-label">DELIVERY METHOD</label>
+              <div className="luxury-delivery-options">
+                <label className="luxury-radio-option">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="home"
+                    checked={deliveryMethod === 'home'}
+                    onChange={handleDeliveryMethodChange}
+                    className="luxury-radio-input"
+                  />
+                  <span className="luxury-radio-custom"></span>
+                  <span className="luxury-radio-label">Home Delivery</span>
+                </label>
+                <label className="luxury-radio-option">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="yalidine"
+                    checked={deliveryMethod === 'yalidine'}
+                    onChange={handleDeliveryMethodChange}
+                    className="luxury-radio-input"
+                  />
+                  <span className="luxury-radio-custom"></span>
+                  <span className="luxury-radio-label">Pickup Point (Yalidine)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Address */}
+            {deliveryMethod === 'home' && (
+              <div className="luxury-form-group luxury-full-width">
+                <label className="luxury-form-label">FULL ADDRESS</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={customerInfo.address}
+                  onChange={handleInputChange}
+                  className={`luxury-form-input ${formErrors.address ? 'luxury-input-error' : ''}`}
+                  placeholder="Street, Neighborhood, Postal Code"
+                />
+                {formErrors.address && <span className="luxury-error-message">{formErrors.address}</span>}
+              </div>
+            )}
+
+            {/* 🆕 IMPROVED: Wilaya and Town Selectors with better visibility */}
+            <div className="luxury-form-group luxury-full-width">
+              <label className="luxury-form-label">SELECT YOUR LOCATION</label>
+              <div className="luxury-location-selectors">
+                <WilayaTownSelector
+                  selectedWilaya={customerInfo.wilaya}
+                  selectedTown={customerInfo.town}
+                  onWilayaChange={handleWilayaChange}
+                  onTownChange={handleTownChange}
+                  wilayaError={formErrors.wilaya}
+                  townError={formErrors.town}
+                  locations={algeriaLocations}
+                  PremiumColors={PremiumColors}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="luxury-form-actions">
+            <button
+              type="submit"
+              disabled={isSubmitting || itemsToProcess.length === 0 || isOrderPlaced}
+              className={`luxury-submit-button ${isSubmitting ? 'luxury-button-animating' : ''} ${!itemsToProcess.length ? 'luxury-button-disabled' : ''}`}
+            >
+              <span className="luxury-button-text">
+                {isSubmitting ? (
+                  <>
+                    <div className="luxury-loading-spinner-small"></div>
+                    PROCESSING...
+                  </>
+                ) : isOrderPlaced ? (
+                  'ORDER PLACED'
+                ) : (
+                  `PLACE ORDER (${formatCurrency(totalAmount)})`
+                )}
+              </span>
+              <div className="luxury-button-glow"></div>
+            </button>
+
+            {isOrderPlaced && (
+              <div className="luxury-success-message">
+                <div className="luxury-success-icon">✓</div>
+                <h3 className="luxury-success-title">ORDER CONFIRMED!</h3>
+                <p className="luxury-success-description">
+                  We will contact you shortly to confirm your order details. Thank you for your trust.
+                </p>
+                <button
+                  onClick={() => onNavigate('home')}
+                  className="luxury-success-button"
+                >
+                  RETURN TO HOME
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  ), [
+    customerInfo,
+    formErrors,
+    deliveryMethod,
+    isSubmitting,
+    isOrderPlaced,
+    itemsToProcess.length,
+    totalAmount,
+    handleInputChange,
+    handlePhoneChange,
+    handleDeliveryMethodChange,
+    handleWilayaChange,
+    handleTownChange,
+    handleSubmitOrder,
+    onNavigate
+  ]);
+
+  if (itemsToProcess.length === 0 && !isOrderPlaced) {
     return (
-      <div className={`text-center py-20 bg-[${VizoColors.OffWhite}] rounded-xl shadow-lg border border-[${VizoColors.SoftHighlight}]/50 m-4 md:m-8 w-full max-w-4xl animate-fade-in`}>
-        <p className={`text-2xl font-semibold text-[${VizoColors.NeutralBlue}] mb-6`}>
-          {t('checkout.noItemsSelected')}
-        </p>
-        <p className={`text-lg text-[${VizoColors.DarkText}] mb-8`}>
-          {t('checkout.goBackToCartPrompt')}
-        </p>
-        <button
-          onClick={() => onNavigate('cart')}
-          className={`bg-[${VizoColors.PrimaryDark}] text-[${VizoColors.LightText}] 
-            px-8 py-4 rounded-full text-lg font-semibold shadow-xl
-            hover:bg-[${VizoColors.AccentOrange}] hover:shadow-2xl 
-            transition-all duration-300 transform hover:scale-105
-            focus:outline-none focus:ring-4 focus:ring-[${VizoColors.SoftHighlight}]/50`
-          }
-          aria-label={t('checkout.goToCartButton')}
-        >
-          {t('checkout.goToCartButton')}
-        </button>
+      <div className="luxury-checkout-page">
+        <div className="luxury-page-background">
+          <div className="luxury-glow-1"></div>
+          <div className="luxury-glow-2"></div>
+        </div>
+
+        <div className="luxury-page-container">
+          <div className="luxury-not-found-container">
+            <div className="luxury-not-found-content">
+              <div className="luxury-not-found-icon">🛒</div>
+              <h2 className="luxury-not-found-title">
+                {directPurchaseData ? 'PROCESSING ERROR' : 'NO ITEMS SELECTED'}
+              </h2>
+              <p className="luxury-not-found-description">
+                {directPurchaseData ? 'Please try again' : 'Please return to cart and add products'}
+              </p>
+              <button
+                onClick={() => directPurchaseData ? onNavigate('products') : onNavigate('cart')}
+                className="luxury-back-button"
+              >
+                {directPurchaseData ? 'BACK TO PRODUCTS' : 'BACK TO CART'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ... (keep the same styles as your original) */}
       </div>
     );
   }
 
   return (
-    <div className={`container mx-auto p-4 md:p-8 bg-[${VizoColors.OffWhite}] rounded-xl shadow-lg m-4 md:m-8 w-full max-w-6xl border border-[${VizoColors.SoftHighlight}]/50 animate-fade-in`}>
-      <h2 className={`text-4xl md:text-5xl font-bold text-[${VizoColors.PrimaryDark}] mb-8 text-center drop-shadow-sm`}>
-        <span className={`text-[${VizoColors.AccentOrange}]`}>{t('checkout.titleHighlight')}</span> {t('checkout.titleRest')}
-      </h2>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {renderCustomerInfoForm()}
-        {renderOrderSummary()}
+    <div className="luxury-checkout-page">
+      {/* Background Effects */}
+      <div className="luxury-page-background">
+        <div className="luxury-glow-1"></div>
+        <div className="luxury-glow-2"></div>
       </div>
 
-      {/* Global Styles for Font and Pattern (if needed, or move to App.js's style block) */}
+      <div className="luxury-page-container">
+        <div className="luxury-content-wrapper">
+          {/* Page Header */}
+          <div className="luxury-page-header">
+            <h1 className="luxury-page-title">
+              COMPLETE YOUR <span className="luxury-accent-text">PURCHASE</span>
+            </h1>
+            <div className="luxury-title-underline"></div>
+          </div>
+
+          {/* Main Content Grid */}
+          <div className="luxury-checkout-grid">
+            {renderCustomerInfoForm}
+            {renderOrderSummary}
+          </div>
+        </div>
+      </div>
+
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-        
-        body {
-          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-          background-color: #f0f2f5; /* A light background for the page */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700,800,900&f[]=satoshi@400,500,600,700,800,900&display=swap');
+
+        .luxury-checkout-page {
+          background-color: ${PremiumColors.DeepMatteBlack};
+          color: ${PremiumColors.PureWhite};
+          font-family: 'Clash Display', 'Satoshi', 'Outfit', sans-serif;
+          min-height: 100vh;
+          position: relative;
+          overflow-x: hidden;
         }
-        
-        /* Custom form input and label styles for better consistency */
-        .form-label {
-          display: block;
-          font-size: 0.875rem; /* text-sm */
-          font-weight: 500; /* font-medium */
-          color: ${VizoColors.DarkText};
-          margin-bottom: 0.5rem; /* mb-2 */
+
+        .luxury-page-background {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
         }
-        
-        .form-input {
+
+        .luxury-glow-1 {
+          position: absolute;
+          top: 20%;
+          left: 10%;
+          width: 40vw;
+          height: 40vw;
+          border-radius: 50%;
+          background: radial-gradient(circle, ${PremiumColors.ElectricBlueStart}05, transparent 60%);
+          filter: blur(40px);
+          opacity: 0.3;
+        }
+
+        .luxury-glow-2 {
+          position: absolute;
+          bottom: 10%;
+          right: 10%;
+          width: 30vw;
+          height: 30vw;
+          border-radius: 50%;
+          background: radial-gradient(circle, ${PremiumColors.ElectricBlueEnd}03, transparent 60%);
+          filter: blur(40px);
+          opacity: 0.2;
+        }
+
+        .luxury-page-container {
+          position: relative;
+          z-index: 10;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .luxury-content-wrapper {
+          padding-top: 2rem;
+        }
+
+        /* Page Header */
+        .luxury-page-header {
+          text-align: center;
+          margin-bottom: 3rem;
+        }
+
+        .luxury-page-title {
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 700;
+          font-size: 3rem;
+          color: ${PremiumColors.PureWhite};
+          letter-spacing: 0.02em;
+          margin-bottom: 1rem;
+        }
+
+        .luxury-accent-text {
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .luxury-title-underline {
+          width: 120px;
+          height: 4px;
+          background: linear-gradient(90deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          border-radius: 2px;
+          margin: 0 auto;
+        }
+
+        /* Checkout Grid */
+        .luxury-checkout-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          margin-bottom: 3rem;
+        }
+
+        /* Form and Summary Containers */
+        .luxury-form-container,
+        .luxury-summary-container {
+          position: relative;
+          border-radius: 20px;
+          overflow: hidden;
+          background: rgba(10, 10, 10, 0.8);
+          backdrop-filter: blur(20px);
+        }
+
+        .luxury-card-border {
+          position: absolute;
+          inset: 0;
+          border-radius: 20px;
+          padding: 1px;
+          background: linear-gradient(135deg, ${PremiumColors.MetallicGray}, ${PremiumColors.MetallicGray});
+          z-index: 1;
+        }
+
+        .luxury-metallic-edge {
           width: 100%;
-          padding: 0.75rem; /* p-3 */
-          border-width: 1px; /* border */
-          border-radius: 0.375rem; /* rounded-md */
-          border-color: ${VizoColors.SoftHighlight}; /* border-gray-300 */
-          transition: all 0.2s ease-in-out; /* transition-all duration-200 */
+          height: 100%;
+          border-radius: 19px;
+          background: linear-gradient(145deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1));
         }
-        
-        .form-input:focus {
+
+        .luxury-form-content,
+        .luxury-summary-content {
+          position: relative;
+          padding: 2rem;
+          z-index: 2;
+        }
+
+        /* Form and Summary Titles */
+        .luxury-form-title,
+        .luxury-summary-title {
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 600;
+          font-size: 1.5rem;
+          color: ${PremiumColors.PureWhite};
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-bottom: 1rem;
+        }
+
+        /* Form Styles */
+        .luxury-form-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .luxury-form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .luxury-full-width {
+          grid-column: 1 / -1;
+        }
+
+        .luxury-form-label {
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: ${PremiumColors.PureWhite};
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-bottom: 0.75rem;
+        }
+
+        /* 🆕 IMPROVED: Input Field Styling for Better Visibility */
+        .luxury-form-input {
+          width: 100%;
+          padding: 1.2rem 1.5rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid ${PremiumColors.GlassBorder};
+          border-radius: 12px;
+          color: ${PremiumColors.InputText}; /* 🆕 Bright white text */
+          font-family: 'Satoshi', sans-serif;
+          font-size: 1.1rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+
+        .luxury-form-input::placeholder {
+          color: ${PremiumColors.PlaceholderText}; /* 🆕 Visible placeholder */
+          font-weight: 400;
+        }
+
+        .luxury-form-input:focus {
           outline: none;
-          box-shadow: 0 0 0 2px ${VizoColors.AccentOrange}; /* focus:ring-2 focus:ring-accent-orange */
-          border-color: transparent; /* focus:border-transparent */
+          border-color: ${PremiumColors.ElectricBlueStart};
+          background: rgba(255, 255, 255, 0.08);
+          box-shadow: 0 0 25px rgba(0, 157, 255, 0.3);
+          transform: translateY(-2px);
         }
-        
-        .form-input.border-red-500 {
-          border-color: #ef4444; /* red-500 */
+
+        .luxury-form-input:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .luxury-input-error {
+          border-color: #ff6b6b !important;
+          box-shadow: 0 0 15px rgba(255, 107, 107, 0.3) !important;
+        }
+
+        .luxury-error-message {
+          color: #ff6b6b;
+          font-family: 'Satoshi', sans-serif;
+          font-size: 0.8rem;
+          margin-top: 0.5rem;
+        }
+
+        /* 🆕 IMPROVED: Location Selectors Container */
+        .luxury-location-selectors {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 12px;
+          padding: 1.5rem;
+          border: 1px solid ${PremiumColors.GlassBorder};
+        }
+
+        /* Phone Input */
+        .luxury-phone-input-container {
+          position: relative;
+        }
+
+        .luxury-phone-input {
+          padding-left: 5rem;
+        }
+
+        .luxury-phone-prefix {
+          position: absolute;
+          left: 1.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: ${PremiumColors.CoolGray};
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 500;
+        }
+
+        /* Delivery Options */
+        .luxury-delivery-options {
+          display: flex;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+
+        .luxury-radio-option {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          cursor: pointer;
+        }
+
+        .luxury-radio-input {
+          display: none;
+        }
+
+        .luxury-radio-custom {
+          width: 20px;
+          height: 20px;
+          border: 2px solid ${PremiumColors.GlassBorder};
+          border-radius: 50%;
+          position: relative;
+          transition: all 0.3s ease;
+        }
+
+        .luxury-radio-input:checked + .luxury-radio-custom {
+          border-color: ${PremiumColors.ElectricBlueStart};
+        }
+
+        .luxury-radio-input:checked + .luxury-radio-custom::after {
+          content: '';
+          width: 10px;
+          height: 10px;
+          background: ${PremiumColors.ElectricBlueStart};
+          border-radius: 50%;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .luxury-radio-label {
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 500;
+          color: ${PremiumColors.PureWhite};
+        }
+
+        /* Submit Button */
+        .luxury-form-actions {
+          margin-top: 2rem;
+        }
+
+        .luxury-submit-button {
+          position: relative;
+          width: 100%;
+          padding: 1.25rem 2rem;
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          border: none;
+          border-radius: 12px;
+          color: ${PremiumColors.PureWhite};
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 600;
+          font-size: 1rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          overflow: hidden;
+        }
+
+        .luxury-submit-button:not(.luxury-button-disabled):not(.luxury-button-animating):hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 157, 255, 0.4);
+        }
+
+        .luxury-button-animating {
+          background: ${PremiumColors.CoolGray} !important;
+          color: ${PremiumColors.MetallicGray} !important;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .luxury-button-disabled {
+          background: rgba(255, 107, 107, 0.1) !important;
+          color: #ff6b6b !important;
+          border: 1px solid rgba(255, 107, 107, 0.3) !important;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .luxury-button-text {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          position: relative;
+          z-index: 2;
+        }
+
+        .luxury-button-glow {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.7s ease;
+        }
+
+        .luxury-submit-button:hover .luxury-button-glow {
+          left: 100%;
+        }
+
+        .luxury-loading-spinner-small {
+          width: 20px;
+          height: 20px;
+          border: 2px solid currentColor;
+          border-top: 2px solid transparent;
+          border-radius: 50%;
+          animation: luxurySpin 1s linear infinite;
+        }
+
+        @keyframes luxurySpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Success Message */
+        .luxury-success-message {
+          text-align: center;
+          padding: 2rem;
+          background: rgba(0, 157, 255, 0.1);
+          border: 1px solid rgba(0, 157, 255, 0.3);
+          border-radius: 15px;
+          margin-top: 1.5rem;
+        }
+
+        .luxury-success-icon {
+          font-size: 3rem;
+          color: ${PremiumColors.ElectricBlueStart};
+          margin-bottom: 1rem;
+        }
+
+        .luxury-success-title {
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 700;
+          font-size: 1.5rem;
+          color: ${PremiumColors.PureWhite};
+          margin-bottom: 1rem;
+        }
+
+        .luxury-success-description {
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 400;
+          font-size: 0.9rem;
+          color: ${PremiumColors.CoolGray};
+          margin-bottom: 1.5rem;
+          line-height: 1.6;
+        }
+
+        .luxury-success-button {
+          padding: 0.75rem 1.5rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid ${PremiumColors.GlassBorder};
+          border-radius: 8px;
+          color: ${PremiumColors.PureWhite};
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 600;
+          font-size: 0.8rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+
+        .luxury-success-button:hover {
+          background: rgba(255, 255, 255, 0.15);
+          border-color: ${PremiumColors.ElectricBlueStart};
+        }
+
+        /* Order Summary Styles */
+        .luxury-items-list {
+          margin: 1.5rem 0;
+        }
+
+        .luxury-item-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          padding: 1rem 0;
+          border-bottom: 1px solid ${PremiumColors.GlassBorder};
+        }
+
+        .luxury-item-row:last-child {
+          border-bottom: none;
+        }
+
+        .luxury-item-info {
+          flex: 1;
+        }
+
+        .luxury-item-name {
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 600;
+          color: ${PremiumColors.PureWhite};
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+
+        .luxury-item-details {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .luxury-item-size {
+          padding: 0.25rem 0.75rem;
+          background: rgba(0, 157, 255, 0.1);
+          border: 1px solid rgba(0, 157, 255, 0.3);
+          border-radius: 15px;
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 500;
+          font-size: 0.8rem;
+          color: ${PremiumColors.ElectricBlueStart};
+        }
+
+        .luxury-item-quantity {
+          padding: 0.25rem 0.75rem;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid ${PremiumColors.GlassBorder};
+          border-radius: 15px;
+          font-family: 'Satoshi', sans-serif;
+          font-weight: 500;
+          font-size: 0.8rem;
+          color: ${PremiumColors.CoolGray};
+        }
+
+        .luxury-item-price {
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 600;
+          color: ${PremiumColors.PureWhite};
+          white-space: nowrap;
+        }
+
+        .luxury-summary-totals {
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid ${PremiumColors.GlassBorder};
+        }
+
+        .luxury-total-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          font-family: 'Satoshi', sans-serif;
+          color: ${PremiumColors.CoolGray};
+        }
+
+        .luxury-total-amount {
+          font-weight: 600;
+          color: ${PremiumColors.PureWhite};
+        }
+
+        .luxury-total-final {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 0;
+          margin-top: 1rem;
+          border-top: 1px dashed ${PremiumColors.GlassBorder};
+          font-family: 'Clash Display', sans-serif;
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: ${PremiumColors.PureWhite};
+        }
+
+        .luxury-final-price {
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-size: 1.3rem;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+          .luxury-checkout-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+          }
+
+          .luxury-page-title {
+            font-size: 3.5rem;
+          }
+
+          .luxury-form-content,
+          .luxury-summary-content {
+            padding: 2.5rem;
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .luxury-checkout-grid {
+            gap: 4rem;
+          }
+
+          .luxury-page-title {
+            font-size: 4rem;
+          }
+        }
+
+        /* Selection Styling */
+        .luxury-checkout-page ::selection {
+          background: ${PremiumColors.ElectricBlueStart};
+          color: ${PremiumColors.PureWhite};
         }
       `}</style>
     </div>
   );
 };
 
-export default CheckoutPage;
+export default React.memo(CheckoutPage);

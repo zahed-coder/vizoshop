@@ -52,21 +52,21 @@ const HomePage = ({ onNavigate }) => {
   // --- UPDATED TESTIMONIALS CONTENT ---
   const testimonials = [
     {
-      name: "Ahmed Ghaouti",
-      role: "Streetwear Enthusiast, Algiers",
-      content: "VIZO's collection is always on point! Their pieces are high-quality and perfectly curated for the latest street style trends. Fast shipping too!",
+      name: "أحمد غواتي",
+      role: "مهتم بملابس الشارع، الجزائر العاصمة",
+      content: "مجموعة VIZO دائمًا على المستوى المطلوب! قطعهم عالية الجودة ومنتقاة بعناية لأحدث صيحات أسلوب الشارع. الشحن سريع أيضًا!",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg"
     },
     {
-      name: "Nour Messaoudi",
-      role: "Fashion Blogger, Oran",
-      content: "Absolutely love shopping at VIZO. The quality of their clothing is consistently excellent, and my orders always arrive super fast. Highly recommend!",
+      name: "نور مسعودي",
+      role: "مدون موضة، وهران",
+      content: "أحب بالتأكيد التسوق في VIZO. جودة ملابسهم ممتازة باستمرار، وتصل طلباتي دائمًا بسرعة فائقة. أوصي بشدة!",
       avatar: "https://randomuser.me/api/portraits/women/44.jpg"
     },
     {
-      name: "Walid Khedim",
-      role: "Urban Explorer, Constantine",
-      content: "Finally a store that understands modern Algerian style. VIZO's selection is unmatched, always fresh and keeps me looking sharp with zero hassle.",
+      name: "وليد خضيم",
+      role: "مستكشف حضري، قسنطينة",
+      content: "أخيرًا متجر يفهم الأسلوب الجزائري الحديث. اختيار VIZO لا مثيل له، دائمًا جديد ويبقيني بمظهر أنيق بدون أي متاعب.",
       avatar: "https://randomuser.me/api/portraits/men/67.jpg"
     }
   ];
@@ -75,23 +75,23 @@ const HomePage = ({ onNavigate }) => {
   const features = [
     {
       icon: '⚡', // Lightning bolt for speed
-      title: "Fast & Reliable Shipping",
-      description: "Get your style delivered swiftly across all Algerian provinces."
+      title: "شحن سريع وموثوق",
+      description: "احصل على أسلوبك بسرعة في جميع أنحاء محافظات الجزائر"
     },
     {
       icon: '✨', // Sparkle for quality/curation
-      title: "Curated Quality",
-      description: "Hand-picked clothing that meets high standards for durability and style."
+      title: "جودة منتقاة",
+      description: "ملابس منتقاة يدويًا تلبي معايير عالية من المتانة والأناقة"
     },
     {
       icon: '📈', // Upward trend for latest trends
-      title: "Latest Trends & Styles",
-      description: "Stay ahead with a constantly updated collection of the freshest fashion."
+      title: "أحدث الصيحات والأنماط",
+      description: "ابقَ في المقدمة مع مجموعة محدثة باستمرار من أحدث صيحات الموضة"
     },
     {
       icon: '📦', // Box for convenience
-      title: "Hassle-Free Returns",
-      description: "Easy exchanges and returns for a worry-free shopping experience."
+      title: "إرجاع سهل",
+      description: "تباديل وإرجاع سهل لتجربة تسوق خالية من المتاعب"
     }
   ];
 
@@ -123,14 +123,14 @@ const HomePage = ({ onNavigate }) => {
         <div className="mb-8 max-w-3xl">
           {/* UPDATED HERO H1 */}
           <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[${VizoColors.LightText}]`}>
-            Your Style, <span className="block mt-2">Curated.</span>
+            أسلوبك، <span className="block mt-2">منتقى بعناية</span>
           </h1>
           
           <div className="w-32 h-0.5 mx-auto my-6 bg-gradient-to-r from-[${VizoColors.GradientPurple}] to-[${VizoColors.GradientYellow}] rounded-full"></div>
           
           {/* UPDATED HERO P */}
           <p className={`text-xl text-[${VizoColors.LightText}]/90`}>
-            Discover the freshest looks and trends, delivered fast to your doorstep across Algeria.
+            اكتشف أحدث المظاهر والاتجاهات، مع توصيل سريع لباب منزلك في جميع أنحاء الجزائر
           </p>
         </div>
 
@@ -140,7 +140,7 @@ const HomePage = ({ onNavigate }) => {
             className={`px-8 py-3 md:px-10 md:py-4 rounded-lg text-lg font-medium bg-[${VizoColors.AccentOrange}] text-[${VizoColors.LightText}]
                        hover:bg-[${VizoColors.AccentOrange}]/90 transition-colors duration-300 shadow-lg`}
           >
-            {t('discoverCollection')}
+            {t('اكتشف المجموعة')}
           </button>
         </div>
       </div>
@@ -162,7 +162,7 @@ const HomePage = ({ onNavigate }) => {
                 ? `bg-[${VizoColors.LightText}] w-6` 
                 : `bg-[${VizoColors.LightText}]/50`
             }`}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={`انتقل إلى الشريحة ${index + 1}`}
           />
         ))}
       </div>
@@ -175,10 +175,10 @@ const HomePage = ({ onNavigate }) => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-[${VizoColors.DarkText}]`}>
-            The <span className={`text-[${VizoColors.AccentOrange}]`}>VIZO</span> Advantage
+            ميزة <span className={`text-[${VizoColors.AccentOrange}]`}>VIZO</span>
           </h2>
           <p className={`text-xl max-w-3xl mx-auto text-[${VizoColors.NeutralBlue}]`}>
-            Experience hassle-free fashion with quality and speed.
+            جرب الموضة بدون متاعب مع الجودة والسرعة
           </p>
         </div>
 
@@ -204,10 +204,10 @@ const HomePage = ({ onNavigate }) => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className={`text-3xl md:text-4xl font-bold mb-4 text-[${VizoColors.LightText}]`}>
-            What Our Customers Say
+            ما يقوله عملاؤنا
           </h2>
           <p className={`text-xl max-w-3xl mx-auto text-[${VizoColors.NeutralBlue}]`}>
-            Real feedback from satisfied VIZO fashion lovers.
+            تعليقات حقيقية من عشاق موضة VIZO الراضين
           </p>
         </div>
 
@@ -221,17 +221,16 @@ const HomePage = ({ onNavigate }) => {
               <p className={`text-[${VizoColors.LightText}] text-lg mb-6 italic`}>
                 {testimonial.content}
               </p>
-              <div className="flex items-center">
-                <div className={`w-14 h-14 rounded-full overflow-hidden border-2 border-[${VizoColors.AccentOrange}] flex-shrink-0`}> {/* Made avatar slightly larger */}
-                  {/* --- FIXED AVATAR RENDERING --- */}
+              <div className="flex items-center flex-row-reverse"> {/* RTL adjustment */}
+                <div className={`w-14 h-14 rounded-full overflow-hidden border-2 border-[${VizoColors.AccentOrange}] flex-shrink-0`}>
                   <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
-                    className="w-full h-full object-cover" // Ensures image fills the circle
-                    onError={(e) => { e.target.onerror = null; e.target.src = `https://via.placeholder.com/150/${VizoColors.SoftHighlight.substring(1)}/${VizoColors.DarkText.substring(1)}?text=👤`; }} // Fallback
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.onerror = null; e.target.src = `https://via.placeholder.com/150/${VizoColors.SoftHighlight.substring(1)}/${VizoColors.DarkText.substring(1)}?text=👤`; }}
                   />
                 </div>
-                <div className="ml-4">
+                <div className="me-4 ms-0 text-right"> {/* RTL adjustment */}
                   <div className={`font-bold text-[${VizoColors.LightText}]`}>{testimonial.name}</div>
                   <div className={`text-sm text-[${VizoColors.NeutralBlue}]`}>{testimonial.role}</div>
                 </div>
@@ -244,53 +243,38 @@ const HomePage = ({ onNavigate }) => {
   );
 
   // --- REDESIGNED FINAL CTA ---
-  const renderFinalCTA = () => (
-    <section className={`py-20 md:py-32 text-center relative overflow-hidden`}
-             style={{
-               background: `linear-gradient(135deg, ${VizoColors.PrimaryDark} 0%, ${VizoColors.GradientPurple} 100%)` // Dynamic gradient
-             }}
-    >
-      {/* Subtle overlay for visual texture */}
-      <div className="absolute inset-0 opacity-10 background-pattern" aria-hidden="true"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <h2 className={`text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 text-[${VizoColors.LightText}] leading-tight`}>
-          {t('Ready to Upgrade Your Wardrobe?') || "Ready to Upgrade Your Wardrobe?"}
-        </h2>
-        <p className={`text-xl md:text-2xl max-w-3xl mx-auto text-[${VizoColors.LightText}]/80 mb-12`}>
-          {t('Explore VIZO hand-picked collection of modern clothing and find your next signature look.') || "Explore VIZO's hand-picked collection of modern clothing and find your next signature look."}
-        </p>
-        <button
-          onClick={() => onNavigate('products')}
-          className={`
-            px-12 py-5 rounded-full text-xl font-bold bg-[${VizoColors.AccentOrange}] text-[${VizoColors.LightText}]
-            hover:bg-[${VizoColors.AccentOrange}]/90 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1
-            focus:outline-none focus:ring-4 focus:ring-[${VizoColors.AccentOrange}]/50
-          `}
-        >
-          {t('shopNow') || "Shop The Collection"}
-        </button>
-      </div>
-    </section>
-  );
-
+ 
   return (
-    <div className="flex flex-col items-center w-full overflow-x-hidden">
+    <div className="flex flex-col items-center w-full overflow-x-hidden" dir="rtl">
       {renderHeroSection()}
       {renderFeaturesSection()}
       {renderTestimonialsSection()}
-      {renderFinalCTA()}
+      
       
       {/* Global Styles for Font and Pattern */}
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
         
         body {
-          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Tajawal', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
           background-color: ${VizoColors.OffWhite};
           margin: 0;
           padding: 0;
           overflow-x: hidden;
+        }
+        
+        /* RTL text alignment adjustments */
+        [dir="rtl"] .text-right {
+          text-align: right;
+        }
+        
+        [dir="rtl"] .text-left {
+          text-align: left;
+        }
+        
+        [dir="rtl"] .text-center {
+          text-align: center;
         }
         
         /* Subtle Diagonal Lines Pattern */

@@ -9,197 +9,197 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 const algeriaLocations = [
   {
     "wilaya": "Adrar",
-    "towns": ["Adrar", "Tamest", "Reggane", "Bordj Badji Mokhtar", "Timimoun", "Aoulef", "Fenoughil", "Tinerkouk"]
+    "towns": ["Adrar", "Tamest", "Reggane", "Bordj Badji Mokhtar", "Timimoun", "Aoulef", "Fenoughil", "Tinerkouk", "Zaouiet Kounta", "Aougrout", "Sali", "Tsabit", "Ouled Ahmed Tammi", "Tit", "Akabli", "Bouda", "Timiaouine", "Charouine", "Tamantit", "In Belbel", "Metarfa", "Timokten", "Talmine", "Sbaa", "In Zghmir", "Ouled Aissa", "Ouled Said", "Ksar Kaddour", "Deldoul", "Oufrane", "Taghouzi", "Tittaf"]
   },
   {
     "wilaya": "Chlef",
-    "towns": ["Chlef", "El Karimia", "Ouled Fares", "Tenes", "Boukadir", "Sobha", "Oued Fodda", "Ain Merane"]
+    "towns": ["Chlef", "El Karimia", "Ouled Fares", "Tenes", "Boukadir", "Sobha", "Oued Fodda", "Ain Merane", "Beni Rached", "Ouled Abbes", "Benairia", "Tadjena", "Taougrite", "Beni Haoua", "Harchoun", "Sidi Akkacha", "Talassa", "Herenfa", "Oued Goussine", "Dahra", "Sendjas", "Zeboudja", "Oued Sly", "Abou El Hassan", "El Marsa", "Chettia", "Sidi Abderrahmane", "Moussadek", "El Hadjadj", "Labiod Medjadja", "Ouled Ben Abdelkader", "Bouzeghaia", "Oum Drou", "Breira", "Beni Bouattab"]
   },
   {
     "wilaya": "Laghouat",
-    "towns": ["Laghouat", "Aflou", "Ksar El Hirane", "Ain Madhi", "Guelt Es Stell"]
+    "towns": ["Laghouat", "Aflou", "Ksar El Hirane", "Ain Madhi", "Gueltat Sidi Saad", "Hassi R'Mel", "Tadjmout", "Brida", "Ain Sidi Ali", "Boukhroufa", "El Assafia", "El Ghich", "El Houita", "El Haouaita", "El Kheneg", "El Khouaz", "Ferdjoune", "Hadjeret M'Guil", "Hassi Delaa", "Ksar El Chellala", "Mekhareg", "Oued Morra", "Oued M'zi", "Sebgag", "Sidi Bouzid", "Sidi Makhlouf"]
   },
   {
     "wilaya": "Oum El Bouaghi",
-    "towns": ["Oum El Bouaghi", "Ain Beida", "Ain M'lila", "Ain Fakroun", "Meskhiana"]
+    "towns": ["Oum El Bouaghi", "Ain Beida", "Ain M'lila", "Ain Fakroun", "Meskiana", "Sigus", "F'Kirina", "Ain Babouche", "Ain Diss", "Ain Kechra", "Ain Zitoun", "Ain Reggada", "Ain Zitoune", "Berriche", "Bir Chouhada", "Dhalaa", "El Ameur", "El Harmilia", "El Fedjoudj", "El Djazia", "El Guera", "Ksar Sbihi", "Souk Naamane", "Ouled Hamla", "Ouled Gacem", "Ouled Zouai", "Rahia", "Zorg"]
   },
   {
     "wilaya": "Batna",
-    "towns": ["Batna", "Barika", "Arris", "Merouana", "Ain Touta", "Tazoult", "Djezzar"]
+    "towns": ["Batna", "Barika", "Arris", "Merouana", "Ain Touta", "Tazoult", "Djezzar", "N'Gaous", "Chemora", "Ras El Aioun", "Ain Yagout", "Ain Djasser", "Tighanimine", "Menaa", "Ouyoun El Assafir", "Seggana", "Ichmoul", "Bouzina", "Tilatou", "Ghassira", "Seriana", "Ouled Fadel", "Taxlent", "Bitam", "Talkhamt", "Lazrou", "Boumagueur", "El Madher", "Timgad", "Kimmel", "Ain Khadra", "Bouarif", "Teniet El Abed", "Fesdis", "Maafa", "Zanet El Beida", "Ouled Sellem", "Rahbat", "Gosbat", "Ben Foudhala El Hakania"]
   },
   {
     "wilaya": "Béjaïa",
-    "towns": ["Béjaïa", "Akbou", "Amizour", "Kherrata", "El Kseur", "Sidi Aïch", "Tichy"]
+    "towns": ["Béjaïa", "Akbou", "Amizour", "Kherrata", "El Kseur", "Sidi Aïch", "Tichy", "Darguina", "Toudja", "Souk El Tenine", "Adekar", "Ait R'Zine", "Ait Smail", "Aokas", "Barbasha", "Beni Djellil", "Beni Ksila", "Beni Maouche", "Chemini", "Dra El Kaid", "Feraoun", "Kendira", "Taskriout", "Tifra", "Timezrit", "Tala Hamza", "Melbou", "Ouzellaguen", "Tamokra", "Taourirt Ighil", "Tibane", "Semaoun", "El Flaye", "Tizi N'Berber", "Beni Mellikeche", "Boukhelifa", "Bouhamza", "Ighram", "El Hammam", "Bouandas", "Tamridjet", "Sidi Bouali", "Akfadou", "Assif El Hammam"]
   },
   {
     "wilaya": "Biskra",
-    "towns": ["Biskra", "Ouled Djellal", "Sidi Okba", "Tolga", "Foughala", "El Kantara"]
+    "towns": ["Biskra", "Ouled Djellal", "Sidi Okba", "Tolga", "Foughala", "El Kantara", "Djemorah", "M'Chouneche", "Zeribet El Oued", "Ain Naga", "Ain Zaatout", "Besbes", "Bordj Ben Azzouz", "Bouchakroun", "Branis", "Chaatma", "Doucen", "El Feidh", "El Ghrous", "El Hadjab", "El Haouch", "El Outaya", "Khenguet Sidi Nadji", "Lichana", "Lioua", "Mekhadma", "Meziraa", "M'Lili", "Oumache", "Ourlel", "Ras El Miad", "Sidi Khaled"]
   },
   {
     "wilaya": "Béchar",
-    "towns": ["Béchar", "Abadla", "Beni Ounif", "Taghit", "Lahmar"]
+    "towns": ["Béchar", "Abadla", "Beni Ounif", "Taghit", "Lahmar", "Kenadsa", "Meridja", "Erg Ferradj", "Beni Abbès", "Boukais", "El Ouata", "Igli", "Kerzaz", "Mougheul", "Tabelbala", "Timoudi", "Beni Ikhlef", "Ksabi", "Guerzim", "Zeghamra", "Mechraa Houari Boumedienne", "Tamtert", "Marhouma", "Mazzer", "Ugarta", "Zoubia", "Souissifa", "El Ksar", "Boutarfaya"]
   },
   {
     "wilaya": "Blida",
-    "towns": ["Blida", "Blida", "Boufarik", "Larbaa", "Meftah", "Mouzaia", "Oued El Alleug"]
+    "towns": ["Blida", "Boufarik", "Larbaa", "Meftah", "Mouzaia", "Oued El Alleug", "Beni Tamou", "Soumaa", "Chiffa", "Bougara", "Bouinan", "Chebli", "Chrea", "El Affroun", "Hammam Melouane", "Ouled Yaich", "Beni Mered", "Sidi Moussa", "Ouled Slama"]
   },
   {
     "wilaya": "Bouira",
-    "towns": ["Bouira", "Lakhdaria", "Sour El Ghozlane", "Ain Bessem", "El Hachimia"]
+    "towns": ["Bouira", "Lakhdaria", "Sour El Ghozlane", "Ain Bessem", "El Hachimia", "M'Chedallah", "Bordj Okhriss", "Haizer", "Ahl El Ksar", "Ain El Hadjar", "Ain Laloui", "Ain Turk", "Aomar", "Ath Mansour", "Bechloul", "Bir Ghbalou", "Bouderbala", "Boukram", "Chorfa", "Dechmia", "Dirah", "Djebahia", "El Adjiba", "El Asnam", "El Khabouzia", "El Mokrani", "Guerrouma", "Hadjera Zerga", "Hanif", "Kadiria", "Maala", "Maamora", "Mezdour", "Ouled Rached", "Raouraoua", "Ridane", "Saharidj", "Souk El Khemis", "Taguedite", "Taghzout", "Z'barbar", "Ouled Rashid"]
   },
   {
     "wilaya": "Tamanrasset",
-    "towns": ["Tamanrasset", "Abalessa", "Tazrouk", "Idles", "Tin Zaouatine"]
+    "towns": ["Tamanrasset", "Abalessa", "Tazrouk", "Idles", "Tin Zaouatine", "In Ghar", "In Salah", "In Amguel", "Djanet", "Bordj Badji Mokhtar", "Tinzaouatene", "In Guezzam", "In Eker", "Ain Guezzam"]
   },
   {
     "wilaya": "Tébessa",
-    "towns": ["Tébessa", "Bir El Ater", "Cheria", "Ouenza", "El Ma Labiodh"]
+    "towns": ["Tébessa", "Bir El Ater", "Cheria", "Ouenza", "El Ma Labiodh", "Morsott", "Negrine", "El Kouif", "Ain Larbi", "Bekkaria", "Bir Dheb", "Bir Mokkadem", "Boukhadra", "Boulogne", "El Aouinet", "El Houidjbet", "Ferkane", "Hammamet", "Kais", "Safsaf El Ouesra", "Guoray", "Youkous", "El Meridj", "El Ogla", "Frej", "Ain Zergua", "Lahouidjebat", "Ogla Melha", "Oum Ali", "Tebessa", "Telidjen"]
   },
   {
     "wilaya": "Tlemcen",
-    "towns": ["Tlemcen", "Ghazaouet", "Maghnia", "Remchi", "Sebdou", "Hennaya"]
+    "towns": ["Tlemcen", "Ghazaouet", "Maghnia", "Remchi", "Sebdou", "Hennaya", "Beni Snous", "Bensekrane", "Ouled Mimoun", "Ain Fezza", "Ain Fetah", "Ain Ghoraba", "Ain Nehala", "Ain Tellout", "Ain Youcef", "Bab El Assa", "Beni Bahdel", "Beni Boussaid", "Beni Mester", "Beni Ouarsous", "Beni Smiel", "Bouhlou", "Chetouane", "Dar Yaghmouracene", "Djazair", "El Aricha", "El Bouihi", "El Gor", "Fellaoucene", "Honaïne", "Kheddim", "Mansourah", "Msirda Fouaga", "Nedroma", "Oued Lakhdar", "Sebbaa", "Sidi Djillali", "Sidi Medjahed", "Souani", "Souahlia", "Terny", "Tienet", "Zenata"]
   },
   {
     "wilaya": "Tiaret",
-    "towns": ["Tiaret", "Frenda", "Ain Deheb", "Sougueur", "Mahdia"]
+    "towns": ["Tiaret", "Frenda", "Ain Deheb", "Sougueur", "Mahdia", "Rahouia", "Mechraa Safa", "Medroussa", "Ain Bouchekif", "Ain El Hadjar", "Ain Kermes", "Ain Zarit", "Dahmouni", "Djebilet Rosfa", "Guertoufa", "Hamadia", "Ksar Chellala", "Mellakou", "Nador", "Oued Lilli", "Sebaine", "Sidi Abderrahmane", "Sidi Ali Mellal", "Sidi Bakhti", "Sidi Hosni", "Sidi Okba", "Souguer", "Tagdemt", "Takhemaret", "Ain El Hadid", "Bougara", "Dahra", "Faidja", "Rechaiga", "Zmalet El Emir Abdelkader"]
   },
   {
     "wilaya": "Tizi Ouzou",
-    "towns": ["Tizi Ouzou", "Ain El Hammam", "Azazga", "Bouzeguene", "Draâ Ben Khedda"]
+    "towns": ["Tizi Ouzou", "Ain El Hammam", "Azazga", "Bouzeguene", "Draâ Ben Khedda", "Mekla", "Tigzirt", "Boghni", "Ouaguenoun", "Aghribs", "Aït Chafaa", "Aït Khellili", "Aït Aggouacha", "Aït Mahmoud", "Aït Ouabane", "Aït Ourir", "Aït Yahia Moussa", "Azeffoun", "Draa El Mizan", "Freha", "Iboudraren", "Iferhounene", "Iflissen", "Illilten", "Larbaâ Nath Irathen", "Makouda", "Mizrana", "Souk El Had", "Tadmaït", "Timizart", "Tirmitine", "Abi Youcef", "Aït Bouaddou", "Aït Boumehdi", "Aït Mahmoud", "Aït Oumalou", "Aït Yahia", "Assi Youcef", "Beni Douala", "Beni Zmenzer", "Bouzeguene", "Chayeb", "Djebel Aïssa Mimoun", "Frais", "Imsouhal", "Irdjen", "Ouacif", "Yatafen", "Zekri"]
   },
   {
-    "wilaya": "Alger",
-    "towns": ["Alger Centre", "Bab Ezzouar", "Bir Mourad Raïs", "Chéraga", "Dar El Beïda", "Hussein Dey", "Rouïba"]
+    "wilaya": "Algiers (Alger)",
+    "towns": ["Algiers Centre", "Bab Ezzouar", "Bir Mourad Raïs", "Chéraga", "Dar El Beïda", "Hussein Dey", "Rouïba", "Bordj El Kiffan", "El Harrach", "Bourouba", "Ain Taya", "Baba Hassen", "Baraki", "Ben Aknoun", "Beni Messous", "Birkhadem", "Bologhine", "Bouzareah", "Casbah", "Dely Ibrahim", "Draria", "Douera", "El Biar", "El Achour", "Gué de Constantine", "Kouba", "Mahelma", "Mohammadia", "Oued Koriche", "Rahmania", "Rais Hamidou", "Reghaia", "Saoula", "Sidi M'Hamed", "Staoueli", "Zeralda"]
   },
   {
     "wilaya": "Djelfa",
-    "towns": ["Djelfa", "Ain Oussara", "Messaad", "Charef", "Dar Chioukh"]
+    "towns": ["Djelfa", "Ain Oussara", "Messaad", "Charef", "Dar Chioukh", "Hassi Bahbah", "El Idrissia", "Guettara", "Ain Chouhada", "Ain El Ibel", "Ain Fekka", "Ain Maabed", "Ain Zidane", "Amourah", "Benhar", "Benyagoub", "Birine", "Bouira Lahdab", "Deldoul", "Douis", "El Guedid", "El Khemis", "Faïdh El Botma", "Had Sahary", "Hassi El Euch", "M'Liliha", "Moudjebara", "Oum Laadham", "Sed Rahal", "Selmana", "Sidi Baizid", "Sidi Laadjel", "Taadmit", "Zaafrane", "Zaccar"]
   },
   {
     "wilaya": "Jijel",
-    "towns": ["Jijel", "Taher", "El Milia", "Chekfa", "Ziamah"]
+    "towns": ["Jijel", "Taher", "El Milia", "Chekfa", "Ziama Mansouriah", "Emir Abdelkader", "Settara", "Kaous", "Bouraoui Belhadef", "Chahna", "Djimla", "El Aouana", "El Kennar Nouchfi", "El Guelb", "Erraguene Souici", "Ghebalna", "Ksir Tahar", "Ouled Rabah", "Selma Ben Ziada", "Sidi Abdelaziz", "Texenna", "Bordj Tahar", "El Ancer", "Khiri Oued Adjoul", "Ouled Yahia Khedrouche", "Roumana", "Souk El Khemis", "Tahar", "Telaghma"]
   },
   {
     "wilaya": "Sétif",
-    "towns": ["Sétif", "El Eulma", "Bousselam", "Ain Oulmene", "Mezloug", "Beni Ouartilane"]
+    "towns": ["Sétif", "El Eulma", "Bougaa", "Ain Oulmene", "Mezloug", "Beni Ourtilane", "Hammam Guergour", "Ain Arnat", "Ain Azel", "Ain Roua", "Ain Lahdjar", "Ain Abessa", "Amoucha", "Babor", "Beni Fouda", "Beni Aziz", "Beni Chebana", "Beni Mohali", "Bazer Sakhra", "Bir El Arch", "Bir Haddada", "Bousselam", "Boutaleb", "Dehamcha", "Djemila", "El Eulma", "El Ouldja", "Guidjel", "Hamma", "Hammam Sokhna", "Harbil", "Ksar El Abtal", "Maouane", "Ouricia", "Ouled Adouane", "Ouled Si Ahmed", "Salah Bey", "Serj El Ghoul", "Tachouda", "Tala Ifacene", "Tiaret", "Tizi N'Bechar", "Ain Seffra", "Rosfa", "Guenzer", "Bouandas"]
   },
   {
     "wilaya": "Saïda",
-    "towns": ["Saïda", "Ain El Hadjar", "Sidi Boubkeur", "Youb"]
+    "towns": ["Saïda", "Ain El Hadjar", "Sidi Boubekeur", "Youb", "El Hassasna", "Ouled Brahim", "Maamora", "Ain Soltane", "Doui Thabet", "El Houassna", "Hassasna", "Tircine", "Sidi Ahmed", "Ain Zerga", "Sidi Amar", "Ouled Khaled", "Rebahia"]
   },
   {
     "wilaya": "Skikda",
-    "towns": ["Skikda", "Ramdane Djamel", "El Harrouch", "Azzaba", "Collo"]
+    "towns": ["Skikda", "Ramdane Djamel", "El Harrouch", "Azzaba", "Collo", "Tamalous", "Ben Azzouz", "Oum Toub", "Ain Bouziane", "Ain Charchar", "Ain Kechra", "Ain Zouit", "Bekkouche Lakhdar", "Bin El Ouidane", "Cheraia", "Djendel", "Filfila", "Guerbes", "Hadaj", "Kanoua", "Kerkera", "Kheneg Mayoum", "Salah Bouchaour", "Sidi Mezghiche", "Zerdaza", "Zitouna"]
   },
   {
     "wilaya": "Sidi Bel Abbès",
-    "towns": ["Sidi Bel Abbès", "Ras El Ma", "Sfisef", "Telagh", "Ain El Berd"]
+    "towns": ["Sidi Bel Abbès", "Ras El Ma", "Sfisef", "Telagh", "Ain El Berd", "Mostefa Ben Brahim", "Tessala", "Moulay Slissen", "Ain Kada", "Ain Thrid", "Ain Tindamine", "Amarnas", "Badredine El Mokrani", "Ben Badis", "Benachiba Chelia", "Boudjebaa El Bordj", "Boukhnafis", "Chettouane Belaila", "Dhaya", "El Haçaiba", "Hassi Dahou", "Lambiridi", "Maksim", "Marhoum", "Merine", "Oued Sefioun", "Rebahia", "Sidi Ali Boussidi", "Sidi Brahim", "Tabia", "Tenira", "Zerouala"]
   },
   {
     "wilaya": "Annaba",
-    "towns": ["Annaba", "El Bouni", "Sidi Amar", "Chetaïbi", "Berrahal"]
+    "towns": ["Annaba", "El Bouni", "Sidi Amar", "Chetaibi", "Berrahal", "Ain Berda", "Treat", "Oued El Aneb", "Cheurfa", "El Hadjar", "Eulma", "Seraïdi"]
   },
   {
     "wilaya": "Guelma",
-    "towns": ["Guelma", "Héliopolis", "Oued Zenati", "Bouchegouf", "Khezaras"]
+    "towns": ["Guelma", "Héliopolis", "Oued Zenati", "Bouchegouf", "Khezaras", "Ain Makhlouf", "Ain Reggada", "Belkheir", "Beni Mezline", "Dahouara", "Djeballah Khemissi", "Guelaat Bou Sbaa", "Hammamet", "Hammam Debagh", "Hammam N'Bail", "M'Djez Amar", "Oued Fragha", "Ras El Agba", "Sedrata", "Tamlouka", "Ain Ben Beida", "Ain Sandel", "Bouati Mahmoud", "Dahmane", "Houari Boumediene", "Rocade", "Sellaoua Announa"]
   },
   {
     "wilaya": "Constantine",
-    "towns": ["Constantine", "El Khroub", "Ain Smara", "Hamma Bouziane", "Didouche Mourad"]
+    "towns": ["Constantine", "El Khroub", "Ain Smara", "Hamma Bouziane", "Didouche Mourad", "Zighoud Youcef", "Ibn Ziad", "Ben Badis", "Ain Abid", "Beni Hamidene", "El Guerrah", "Ouled Rahmoune", "Messaoud Boudjriou", "Ali Mendjeli"]
   },
   {
     "wilaya": "Médéa",
-    "towns": ["Médéa", "Berrouaghia", "Ksar Boukhari", "Chahbounia", "Tablat"]
+    "towns": ["Médéa", "Berrouaghia", "Ksar Boukhari", "Chahbounia", "Tablat", "Ouzera", "Souagui", "Beni Slimane", "Ain Boucif", "Ain Ouksir", "Aziz", "Benchicao", "Beni Laalem", "Bir Ben Abed", "Boghar", "Bouskene", "Cheniguel", "Derrag", "Djouab", "El Azizia", "El Hamdania", "El Omaria", "Guelb El Kebir", "Hannacha", "Kef Lakhdar", "Ouamri", "Ouled Antar", "Ouled Bouachra", "Ouled Brahim", "Ouled Deïd", "Ouled Hellal", "Ouled Maaref", "Rebaia", "Sidi Mahjoub", "Si Mahdjoub", "Tlatet Eddouar", "Zoubiria"]
   },
   {
     "wilaya": "Mostaganem",
-    "towns": ["Mostaganem", "Hassi Mameche", "Ain Tedles", "Mesra", "Bouguirat"]
+    "towns": ["Mostaganem", "Hassi Mameche", "Ain Tedles", "Mesra", "Bouguirat", "Sidi Ali", "Kheireddine", "Sour", "Achacha", "Ain Boudinar", "Ain Sidi Cherif", "Aghbal", "Benabdelmalek Ramdane", "Fornaka", "Hadjdjadj", "Khadra", "Mansourah", "Mazagran", "Nekmaria", "Oued El Kheir", "Safsaf", "Sayada", "Sidi Belattar", "Sirat", "Souaflia", "Tazgait"]
   },
   {
     "wilaya": "M'Sila",
-    "towns": ["M'Sila", "Bou Saada", "Magra", "Sidi Aïssa", "Ouled Derradj"]
+    "towns": ["M'Sila", "Bou Saada", "Magra", "Sidi Aïssa", "Ouled Derradj", "Ain El Melh", "Ouled Sidi Brahim", "Khoubana", "Ain Fares", "Ain Khadra", "Ain Lahdjel", "Ain El Hadjel", "Ain Errich", "Beni Ilmane", "Belaiba", "Benzouh", "Berhoum", "Bouty Sayah", "Chellal", "Dehahna", "Djebel Messaad", "Hamam Dalaa", "Mohamed Boudiaf", "Ouled Mansour", "Ouled Slimane", "Ouled Attia", "Oultene", "Tamsa", "Souamaa", "Zarzour", "El Hmadia", "M'Tarfa", "Mezrir", "M'Cif", "Medjedel", "Ain Dzrit"]
   },
   {
     "wilaya": "Mascara",
-    "towns": ["Mascara", "Mohammadia", "Sig", "Tighenif", "Ghriss"]
+    "towns": ["Mascara", "Mohammadia", "Sig", "Tighenif", "Ghriss", "El Bordj", "Zahana", "Aouf", "Ain Fares", "Ain Fras", "Ain Fekan", "Ain Kheir", "Bou Hanifia", "Chelalou", "Chorfa", "El Gaada", "El Ghomri", "El Keurt", "Ferraguig", "Hacine", "Hachem", "Mamounia", "Matemore", "Mokhtar", "Oued El Abtal", "Oued Taria", "Sebaa", "Sidi Abdeldjebar", "Sidi Boussaid", "Sidi Kada", "Sidi Mahmed Ben Ali", "Tizi", "Ain Ferah", "Guerdjoum", "Sehailia"]
   },
   {
     "wilaya": "Ouargla",
-    "towns": ["Ouargla", "Touggourt", "Hassi Messaoud", "Rouissat", "Nezla"]
+    "towns": ["Ouargla", "Touggourt", "Hassi Messaoud", "Rouissat", "Nezla", "El Hadjira", "Sidi Khouiled", "Benaceur", "Ain Beida", "Blidet Amor", "El Borma", "El Hedjira", "Hassi Ben Abdellah", "Megarine", "N'Goussa", "Temacine", "Tegueddane", "Zemrane", "El Allia", "Taibet", "Zaouia El Abidia", "Mzab", "Sidi Ameur"]
   },
   {
     "wilaya": "Oran",
-    "towns": ["Oran", "Arzew", "Bir El Djir", "Es Senia", "Gdyel", "Hassi Bounif", "Mers El Kébir"]
+    "towns": ["Oran", "Arzew", "Bir El Djir", "Es Senia", "Gdyel", "Hassi Bounif", "Mers El Kébir", "Ain El Turk", "Boutlelis", "Ain Biya", "Ain Kerma", "Ben Freha", "Boufatis", "El Braya", "El Ançor", "Hassi Ben Okba", "Misserghin", "Oued Tlelat", "Sidi Ben Yebka", "Sidi Chami", "Tafraoui"]
   },
   {
     "wilaya": "El Bayadh",
-    "towns": ["El Bayadh", "Bougtob", "Chellala", "Brezina", "Rogassa"]
+    "towns": ["El Bayadh", "Bougtob", "Chellala", "Brezina", "Rogassa", "El Abiodh Sidi Cheikh", "Arbaouat", "Kef El Ahmar", "Ain El Orak", "Ain Skhouna", "Boussemghoun", "El Bnoud", "El Kheiter", "El Mehara", "Ghassoul", "Kraakda", "Sidi Ameur", "Sidi Slimane", "Sidi Tifour", "Stitten", "Tousmouline"]
   },
   {
     "wilaya": "Illizi",
-    "towns": ["Illizi", "Djanet", "Debdeb", "Bordj Omar Driss"]
+    "towns": ["Illizi", "Djanet", "Debdeb", "Bordj Omar Driss", "In Amenas", "Zarzaitine", "In Ezzane"]
   },
   {
     "wilaya": "Bordj Bou Arréridj",
-    "towns": ["Bordj Bou Arréridj", "Ras El Oued", "Ain Taghrout", "Mansoura", "Bordj Ghedir"]
+    "towns": ["Bordj Bou Arréridj", "Ras El Oued", "Ain Taghrout", "Mansourah", "Bordj Ghedir", "El Hamadia", "Medjana", "Tassameurt", "Ain Tesra", "Belimour", "Ben Daoud", "Bir Kasdali", "Colla", "Djaafra", "El Achir", "El Main", "El Ach", "Khelafa", "Ksour", "Rabta", "Tixter", "Ain Legradj", "Hammam El Bibane", "Harraza", "Ouled Brahem", "Ouled Dahmane", "Tala Oughlit"]
   },
   {
     "wilaya": "Boumerdès",
-    "towns": ["Boumerdès", "Dellys", "Boudouaou", "Khemis El Khechna", "Thenia"]
+    "towns": ["Boumerdès", "Dellys", "Boudouaou", "Khemis El Khechna", "Thenia", "Corso", "Naciria", "Baghlia", "Afir", "Ammal", "Beni Amrane", "Boudouaou El Bahri", "Cap Djinet", "Chabet El Ameur", "Draâ Ben Khedda", "Fondouk", "Isser", "Keddara", "Ouled Moussa", "Si Mustapha", "Sidi Daoud", "Souk El Had", "Tidjelabine", "Zemmouri", "Ait Chafaa", "Beni Fouda", "El Karimia", "Meraldene"]
   },
   {
     "wilaya": "El Tarf",
-    "towns": ["El Tarf", "El Kala", "Ben M'hidi", "Drean", "Bouteldja"]
+    "towns": ["El Tarf", "El Kala", "Ben M'hidi", "Dréan", "Bouteldja", "Bouhadjar", "Lac des Oiseaux", "Besbes", "Ain El Assel", "Ain Kerma", "Asfour", "Berrihane", "Boughous", "Chabaita Mokhtar", "Chefia", "Chihani", "Echatt", "El Aïoun", "Hammamet", "Oued Zitoun", "Raml Souk", "Zerizer", "Zitouna"]
   },
   {
     "wilaya": "Tindouf",
-    "towns": ["Tindouf", "Oum El Assel"]
+    "towns": ["Tindouf", "Oum El Assel", "Zouerate", "Garet Djebilet"]
   },
   {
     "wilaya": "Tissemsilt",
-    "towns": ["Tissemsilt", "Theniet El Had", "Bordj Bounaama", "Lardjem"]
+    "towns": ["Tissemsilt", "Theniet El Had", "Bordj Bounaama", "Lardjem", "Khemisti", "Lazharia", "Bordj Emir Abdelkader", "Ain El Hadid", "Amari", "Layoune", "Maâcem", "Ouled Bessam", "Sidi Boutouch", "Sidi Lantri", "Sidi Slimane", "Tamalaht", "Youssoufia"]
   },
   {
     "wilaya": "El Oued",
-    "towns": ["El Oued", "Guemar", "Debila", "Robbah", "Magrane"]
+    "towns": ["El Oued", "Guemar", "Debila", "Robbah", "Magrane", "Djamaa", "Mih Ouensa", "Taleb Larbi", "Bayadha", "Hassani Abdelkrim", "Hassi Khelifa", "Kouinine", "Nakhla", "Ourmas", "Reguiba", "Sidi Aoun", "Taghzout", "Trifaoui"]
   },
   {
     "wilaya": "Khenchela",
-    "towns": ["Khenchela", "Chechar", "Ain Touila", "Kaïs", "Babar"]
+    "towns": ["Khenchela", "Chechar", "Ain Touila", "Kaïs", "Babar", "Tamza", "Yabous", "Ouled Rechache", "Ain Mimoun", "Baghai", "Bouhmama", "Djellal", "El Hamma", "El Mahmal", "Fais", "Khirane", "M'Sara", "N'Ser", "Remila", "Taouzianat", "T'Kout", "Cherchar"]
   },
   {
     "wilaya": "Souk Ahras",
-    "towns": ["Souk Ahras", "Sedrata", "Taoura", "M'daourouch", "Haddada"]
+    "towns": ["Souk Ahras", "Sedrata", "Taoura", "M'Daourouch", "Haddada", "Ouled Driss", "Merahna", "Zaarouria", "Ain Senour", "Bir Bouhouche", "Drea", "Dréan", "Heddada", "Khedara", "Machroha", "Oued Kebrit", "Ouillen", "Sidi Fredj", "Tiffech", "Zouabi", "Douar Ben Ouerghi"]
   },
   {
     "wilaya": "Tipaza",
-    "towns": ["Tipaza", "Cherchell", "Fouka", "Hadjeret Ennous", "Kolea", "Staoueli"]
+    "towns": ["Tipaza", "Cherchell", "Fouka", "Hadjret Ennous", "Kolea", "Staoueli", "Sidi Amar", "Gouraya", "Ahmar El Ain", "Ain Tagourait", "Attatba", "Ben Khedda", "Beni Milleuk", "Bourkika", "Chaiba", "Damous", "Larhat", "Menaceur", "Nador", "Ouled Azzouz", "Sidi Ghiles"]
   },
   {
     "wilaya": "Mila",
-    "towns": ["Mila", "Chelghoum Laïd", "Grarem Gouga", "Tadjenanet", "Rouached"]
+    "towns": ["Mila", "Chelghoum Laid", "Grarem Gouga", "Tadjenanet", "Rouached", "Teleghma", "Ahmed Rachedi", "Oued Endja", "Ain Beida", "Ain Mellouk", "Ain Tine", "Benyahia", "Bouhatem", "Boumahra Ahmed", "Chigara", "Derradji Bousselah", "El Mechira", "Hamala", "Merdj Hamed", "M'Chira", "Minar Zarza", "Sidi Khelifa", "Sidi Merouane", "Tessala Lemtai", "Terrai Bainem", "Zeghaia", "Ayaida"]
   },
   {
     "wilaya": "Aïn Defla",
-    "towns": ["Aïn Defla", "Khemis Miliana", "El Attaf", "Miliana", "Boumedfaa"]
+    "towns": ["Aïn Defla", "Khemis Miliana", "El Attaf", "Miliana", "Boumedfaa", "Djelida", "Ain Lechiakh", "Bordj Emir Khaled", "Ain Bouyahia", "Ain Soltane", "Ain Torki", "Arib", "Bathia", "Belaas", "Ben Allal", "Bir Bouche", "Bir Ould Khelifa", "Bourached", "Djemaa Ouled Cheikh", "Djendel", "El Abadia", "El Amra", "El Maine", "Hammam Righa", "Hassania", "Hoceinia", "Oued Djemaa", "Oued Chorfa", "Rouina", "Sidi Lakhdar", "Tacheta Zegagha", "Tarik Ibn Ziad", "Tiberkanine", "Zeddine"]
   },
   {
     "wilaya": "Naâma",
-    "towns": ["Naâma", "Mecheria", "Ain Sefra", "Tiout", "Moghrar"]
+    "towns": ["Naâma", "Mecheria", "Ain Sefra", "Tiout", "Moghrar", "Assela", "Ain Ben Khelil", "Mekmen Ben Amar", "Djeniene Bourezg", "El Biod", "Kasdir", "Sfissifa"]
   },
   {
-    "wilaya": "Ain Témouchent",
-    "towns": ["Ain Témouchent", "Hammam Bou Hadjar", "Beni Saf", "El Amria", "Ain Kihal"]
+    "wilaya": "Aïn Témouchent",
+    "towns": ["Aïn Témouchent", "Hammam Bou Hadjar", "Beni Saf", "El Amria", "Ain Kihal", "Ouled Boudjemaa", "Terga", "El Malah", "Ain El Arbaa", "Ain Tolba", "Aghlal", "Ain Fares", "Chentouf", "El Emir Abdelkader", "Hassasna", "Oued Berkeche", "Ouled Kihal", "Tamzoura"]
   },
   {
     "wilaya": "Ghardaïa",
-    "towns": ["Ghardaïa", "El Atteuf", "Berriane", "Daya Ben Dahoua", "Metlili"]
+    "towns": ["Ghardaïa", "El Atteuf", "Berriane", "Daya Ben Dahoua", "Metlili", "Zelfana", "Sebseb", "Bounoura", "Ben Izguen", "Dhaya Ben Dahoua", "Mansoura"]
   },
   {
     "wilaya": "Relizane",
-    "towns": ["Relizane", "Oued Rhiou", "Mazouna", "Zemoura", "Ain Rahma"]
+    "towns": ["Relizane", "Oued Rhiou", "Mazouna", "Zemoura", "Ain Rahma", "Mediouna", "El Matmar", "Sidi M'Hamed Ben Ali", "Ain Tarek", "Beni Dergoun", "Beni Zentis", "Dar Ben Abdelaziz", "Djidiouia", "El H'Madna", "Had Echkalla", "Hamri", "Kalaâ", "Mendès", "Oued El Djemaa", "Oued Essalem", "Sidi Khettab", "Yellel"]
   }
-];
+]
 
 /**
  * WilayaTownSelector Component
@@ -214,6 +214,7 @@ const algeriaLocations = [
  * @param {function(string): void} props.onTownChange - Callback for when the Town changes.
  * @param {string} [props.wilayaError] - Optional error message for the Wilaya field.
  * @param {string} [props.townError] - Optional error message for the Town field.
+ * @param {object} [props.PremiumColors] - Color palette for styling.
  */
 const WilayaTownSelector = ({
   selectedWilaya,
@@ -221,7 +222,8 @@ const WilayaTownSelector = ({
   onWilayaChange,
   onTownChange,
   wilayaError,
-  townError
+  townError,
+  PremiumColors
 }) => {
   // Memoize the list of wilayas for efficiency.
   const wilayas = useMemo(() => algeriaLocations.map(location => location.wilaya).sort(), []);
@@ -249,7 +251,7 @@ const WilayaTownSelector = ({
    */
   const handleWilayaChange = useCallback((e) => {
     onWilayaChange(e.target.value);
-  }, [onWilayaChange]); // `onWilayaChange` is a stable prop from CheckoutPage, could remove dependency array but keeping for strict lint.
+  }, [onWilayaChange]);
 
   /**
    * Handles the change event for the Town dropdown.
@@ -258,79 +260,227 @@ const WilayaTownSelector = ({
    */
   const handleTownChange = useCallback((e) => {
     onTownChange(e.target.value);
-  }, [onTownChange]); // `onTownChange` is a stable prop from CheckoutPage, could remove dependency array but keeping for strict lint.
+  }, [onTownChange]);
 
   return (
-    // Grid layout for the two dropdowns, taking full width on small screens and half width on larger.
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
-      {/* Wilaya (Province) Selector */}
-      <div>
-        <label htmlFor="wilaya-select" className="form-label">Wilaya (State)</label>
-        <div className="relative">
-          <select
-            id="wilaya-select"
-            name="wilaya"
-            value={selectedWilaya}
-            onChange={handleWilayaChange}
-            className={`form-input appearance-none pr-10 cursor-pointer ${wilayaError ? 'border-red-500' : ''}`}
-            required
-            aria-required="true"
-            aria-invalid={!!wilayaError}
-            aria-describedby={wilayaError ? 'wilaya-error' : undefined}
-          >
-            <option value="" disabled>Select Wilaya</option>
-            {wilayas.map((wilaya) => (
-              <option key={wilaya} value={wilaya}>
-                {wilaya}
+    <div className="wilaya-town-selector-container">
+      <div className="wilaya-town-grid">
+        {/* Wilaya (Province) Selector */}
+        <div className="wilaya-selector-group">
+          <label htmlFor="wilaya-select" className="wilaya-town-label">WILAYA</label>
+          <div className="wilaya-town-input-container">
+            <select
+              id="wilaya-select"
+              name="wilaya"
+              value={selectedWilaya}
+              onChange={handleWilayaChange}
+              className={`wilaya-town-select ${wilayaError ? 'wilaya-town-error' : ''}`}
+              style={{
+                backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A',
+                color: PremiumColors?.PureWhite || '#FFFFFF',
+                borderColor: wilayaError ? '#ff6b6b' : PremiumColors?.GlassBorder || 'rgba(255, 255, 255, 0.08)'
+              }}
+              required
+              aria-required="true"
+              aria-invalid={!!wilayaError}
+              aria-describedby={wilayaError ? 'wilaya-error' : undefined}
+            >
+              <option value="" style={{ backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A', color: PremiumColors?.PureWhite || '#FFFFFF' }}>
+                Select Wilaya
               </option>
-            ))}
-          </select>
-          {/* Custom dropdown arrow SVG for better visual consistency */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#b3b3b3]">
-            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-            </svg>
+              {wilayas.map((wilaya) => (
+                <option 
+                  key={wilaya} 
+                  value={wilaya}
+                  style={{ backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A', color: PremiumColors?.PureWhite || '#FFFFFF' }}
+                >
+                  {wilaya}
+                </option>
+              ))}
+            </select>
+            <div className="wilaya-town-arrow">
+              <svg className="wilaya-town-arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
           </div>
+          {wilayaError && (
+            <p id="wilaya-error" className="wilaya-town-error-message">{wilayaError}</p>
+          )}
         </div>
-        {wilayaError && (
-          <p id="wilaya-error" className="text-red-500 text-sm mt-1 animate-fade-in-down">{wilayaError}</p>
-        )}
+
+        {/* Town/Commune Selector */}
+        <div className="wilaya-selector-group">
+          <label htmlFor="town-select" className="wilaya-town-label">TOWN</label>
+          <div className="wilaya-town-input-container">
+            <select
+              id="town-select"
+              name="town"
+              value={selectedTown}
+              onChange={handleTownChange}
+              className={`wilaya-town-select ${townError ? 'wilaya-town-error' : ''} ${!selectedWilaya ? 'wilaya-town-disabled' : ''}`}
+              style={{
+                backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A',
+                color: PremiumColors?.PureWhite || '#FFFFFF',
+                borderColor: townError ? '#ff6b6b' : PremiumColors?.GlassBorder || 'rgba(255, 255, 255, 0.08)'
+              }}
+              disabled={!selectedWilaya}
+              required
+              aria-required="true"
+              aria-invalid={!!townError}
+              aria-describedby={townError ? 'town-error' : undefined}
+            >
+              <option value="" style={{ backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A', color: PremiumColors?.PureWhite || '#FFFFFF' }}>
+                {selectedWilaya ? "Select Town" : "Select Wilaya First"}
+              </option>
+              {towns.map((town) => (
+                <option 
+                  key={town} 
+                  value={town}
+                  style={{ backgroundColor: PremiumColors?.MetallicGray || '#1A1A1A', color: PremiumColors?.PureWhite || '#FFFFFF' }}
+                >
+                  {town}
+                </option>
+              ))}
+            </select>
+            <div className="wilaya-town-arrow">
+              <svg className="wilaya-town-arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+          {townError && (
+            <p id="town-error" className="wilaya-town-error-message">{townError}</p>
+          )}
+        </div>
       </div>
 
-      {/* Town/Commune Selector */}
-      <div>
-        <label htmlFor="town-select" className="form-label">Town</label>
-        <div className="relative">
-          <select
-            id="town-select"
-            name="town"
-            value={selectedTown}
-            onChange={handleTownChange}
-            className={`form-input appearance-none pr-10 cursor-pointer ${townError ? 'border-red-500' : ''}`}
-            disabled={!selectedWilaya} // Disable until a Wilaya is selected
-            required
-            aria-required="true"
-            aria-invalid={!!townError}
-            aria-describedby={townError ? 'town-error' : undefined}
-          >
-            <option value="" disabled>{selectedWilaya ? "Select Town" : "Select Wilaya first"}</option>
-            {towns.map((town) => (
-              <option key={town} value={town}>
-                {town}
-              </option>
-            ))}
-          </select>
-          {/* Custom dropdown arrow SVG for better visual consistency */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#b3b3b3]">
-            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-            </svg>
-          </div>
-        </div>
-        {townError && (
-          <p id="town-error" className="text-red-500 text-sm mt-1 animate-fade-in-down">{townError}</p>
-        )}
-      </div>
+      <style jsx>{`
+        .wilaya-town-selector-container {
+          width: 100%;
+        }
+
+        .wilaya-town-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          width: 100%;
+        }
+
+        @media (min-width: 768px) {
+          .wilaya-town-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+          }
+        }
+
+        .wilaya-selector-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .wilaya-town-label {
+          font-family: 'Clash Display', 'Satoshi', sans-serif;
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: #FFFFFF;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-bottom: 0.75rem;
+          display: block;
+        }
+
+        .wilaya-town-input-container {
+          position: relative;
+          width: 100%;
+        }
+
+        .wilaya-town-select {
+          width: 100%;
+          padding: 1.2rem 3rem 1.2rem 1.5rem;
+          background: #1A1A1A;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          color: #FFFFFF;
+          font-family: 'Satoshi', sans-serif;
+          font-size: 1rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          appearance: none;
+          min-height: 54px;
+        }
+
+        .wilaya-town-select:focus {
+          outline: none;
+          border-color: #009DFF;
+          background: rgba(255, 255, 255, 0.08);
+          box-shadow: 0 0 25px rgba(0, 157, 255, 0.3);
+          transform: translateY(-2px);
+        }
+
+        .wilaya-town-select:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .wilaya-town-disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        .wilaya-town-error {
+          border-color: #ff6b6b !important;
+          box-shadow: 0 0 15px rgba(255, 107, 107, 0.3) !important;
+        }
+
+        .wilaya-town-arrow {
+          position: absolute;
+          right: 1.2rem;
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none;
+          color: #009DFF;
+        }
+
+        .wilaya-town-arrow-icon {
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+
+        .wilaya-town-error-message {
+          color: #ff6b6b;
+          font-family: 'Satoshi', sans-serif;
+          font-size: 0.8rem;
+          margin-top: 0.5rem;
+          animation: fadeInDown 0.3s ease-out;
+        }
+
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+          .wilaya-town-select {
+            font-size: 16px; /* Prevent zoom on iOS */
+            padding: 1rem 2.5rem 1rem 1rem;
+            min-height: 48px;
+          }
+
+          .wilaya-town-arrow {
+            right: 1rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };

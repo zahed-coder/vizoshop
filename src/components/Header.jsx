@@ -1,25 +1,24 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '../context/CartContext';
-import { useLanguage } from '../context/LanguageContext';
 import Logo from '../assets/images/services/logo.png';
 
-// Updated color palette with subtle enhancements
-const VizoColors = {
-  PrimaryDarkBlur: '#1A2A3A',       // Slightly darker for better contrast
-  AccentOrange: '#E66B3B',
-  LightText: '#FFFFFF',
-  NeutralBlue: '#6A8DAD',
-  OffWhiteBody: '#F9F9F9',
-  SoftHighlight: '#A0AEC0',         // Softer highlight
-  GradientPurple: '#9D50BB',        // New purple for gradient
-  GradientYellow: '#F2D50F'         // New yellow for gradient
+// Enhanced Premium Luxury Color Palette
+const PremiumColors = {
+  DeepMatteBlack: '#000000',
+  PureWhite: '#FFFFFF',
+  ElectricBlueStart: '#009DFF',
+  ElectricBlueEnd: '#00FFE0',
+  TextHover: 'rgba(255, 255, 255, 0.7)',
+  LogoGlowBase: 'rgba(255, 255, 255, 0.25)',
+  LogoGlowHover: 'rgba(255, 255, 255, 0.35)',
+  BlueGlowIntense: 'rgba(0, 157, 255, 0.4)',
+  AmbientMist: 'rgba(0, 157, 255, 0.05)'
 };
 
 const Header = ({ onNavigate, isAdmin, currentUser, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
-  const { lang, setLang, t } = useLanguage();
   const totalItemsInCart = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
@@ -40,137 +39,175 @@ const Header = ({ onNavigate, isAdmin, currentUser, onLogout }) => {
     onNavigate(page);
   };
 
-  const handleLanguageChange = (e) => {
-    setLang(e.target.value);
-  };
-
   return (
     <>
-      {/* Enhanced Blurred Header with scroll effect */}
-      <header className={`w-full z-50 fixed top-0 transition-all duration-300 ease-in-out ${isScrolled ? 'shadow-xl py-2' : 'py-3'}`}
-              style={{
-                backgroundColor: `rgba(26, 42, 58, ${isScrolled ? 0.95 : 0.85})`, // Adjust opacity on scroll
-                backdropFilter: 'blur(16px)', // Increased blur
-                WebkitBackdropFilter: 'blur(16px)', // For Safari support
-                borderBottom: `1px solid rgba(160, 174, 192, 0.2)`
-              }}>
-        <div className="container mx-auto px-4 flex justify-between items-center h-20"> {/* Increased height for bigger logo */}
-          {/* Logo with continuously animated gradient line */}
-          <div className="flex items-center">
-            <div 
-              className="cursor-pointer flex flex-col items-center group relative logo-container" // Added class for animation
-              onClick={() => onNavigate('home')}
-            >
-              <img 
-                src={Logo} 
-                alt="VIZO Logo" 
-                className="h-16 transition-all duration-300 group-hover:opacity-95" // Made logo bigger
+      {/* Premium Luxury Header */}
+      <header 
+        className={`w-full z-50 fixed top-0 transition-all duration-500 ease-out ${
+          isScrolled ? 'py-2 md:py-3' : 'py-3 md:py-4'
+        }`}
+        style={{
+          backgroundColor: PremiumColors.DeepMatteBlack,
+          backdropFilter: 'blur(25px)',
+          WebkitBackdropFilter: 'blur(25px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          fontFamily: "'Outfit', 'Satoshi', 'Neue Montreal', -apple-system, BlinkMacSystemFont, sans-serif"
+        }}
+      >
+        {/* Enhanced Ambient Background Mist */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at 50% 50%, ${PremiumColors.AmbientMist}, transparent 70%)`,
+            opacity: 0.6
+          }}
+        ></div>
+
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 flex justify-between items-center h-16 md:h-20 lg:h-24 relative z-10">
+          
+          {/* Left Navigation - Hidden on mobile */}
+          <div className="flex-1 hidden lg:flex justify-end items-center">
+            <div className="flex items-center gap-8 md:gap-12 lg:gap-[4.5rem]"> 
+              <LuxuryNavButton
+                onClick={() => onNavigate('home')}
+                text="HOME"
               />
-              <div 
-                className="absolute bottom-0 w-full h-0.5 animate-gradient-line" // Applied animation class
-                style={{ 
-                  background: `linear-gradient(90deg, ${VizoColors.GradientPurple}, ${VizoColors.GradientYellow})`,
-                }}
-              ></div>
+              <LuxuryNavButton
+                onClick={() => onNavigate('products')}
+                text="SHOP"
+              />
+              <LuxuryNavButton
+                onClick={() => onNavigate('collections')}
+                text="COLLECTIONS"
+              />
             </div>
           </div>
 
-          {/* Desktop Navigation - Simplified */}
-          <nav className="hidden md:flex items-center space-x-8 font-outfit">
-            <NavButton 
+          {/* Centered Logo - Responsive sizing */}
+          <div className="flex-shrink-0 mx-4 sm:mx-8 md:mx-12 lg:mx-20">
+            <div
+              className="cursor-pointer flex items-center justify-center luxury-logo-container"
               onClick={() => onNavigate('home')}
-              text={t('home')}
-            />
-            
-            <NavButton 
-              onClick={() => onNavigate('products')}
-              text={t('products')}
-            />
-            
-            {isAdmin && (
-              <NavButton 
-                onClick={() => onNavigate('admin')}
-                text={t('admin')}
-              />
-            )}
-            
-            {/* Modern Language Selector */}
-            <div className="relative group">
-              <div className="flex items-center space-x-1 cursor-pointer px-2 py-1 rounded-lg transition-colors duration-200 hover:bg-white/10">
-                <span className="text-white text-sm">{lang.toUpperCase()}</span>
-                <svg className="w-4 h-4 text-white transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              
-              <div className="absolute top-full right-0 mt-2 w-28 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden opacity-0 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:pointer-events-auto transform group-hover:translate-y-0 translate-y-1">
-                <select
-                  className="w-full bg-transparent text-gray-800 py-2 px-3 cursor-pointer focus:outline-none"
-                  value={lang}
-                  onChange={handleLanguageChange}
-                >
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                  <option value="ar">العربية</option>
-                </select>
+            >
+              <div className="relative luxury-logo-float">
+                {/* Primary Glow Layer - Animated */}
+                <div 
+                  className="absolute inset-0 luxury-logo-glow-base glowing-aura"
+                  style={{
+                    background: `radial-gradient(circle at center, ${PremiumColors.LogoGlowBase}, ${PremiumColors.BlueGlowIntense}40, transparent 60%)`,
+                    filter: 'blur(20px) sm:blur(25px) lg:blur(30px)',
+                    opacity: 0.9,
+                    transform: 'scale(1.2) sm:scale(1.25) lg:scale(1.3)'
+                  }}
+                ></div>
+
+                {/* Electric Blue Aura Layer */}
+                <div 
+                  className="absolute inset-0 luxury-logo-blue-aura glowing-aura-delayed"
+                  style={{
+                    background: `radial-gradient(circle at center, ${PremiumColors.ElectricBlueStart}50, ${PremiumColors.ElectricBlueEnd}30, transparent 70%)`,
+                    filter: 'blur(25px) sm:blur(30px) lg:blur(35px)',
+                    opacity: 0.7,
+                    transform: 'scale(1.3) sm:scale(1.35) lg:scale(1.4)'
+                  }}
+                ></div>
+
+                {/* Hover Glow Enhancement */}
+                <div 
+                  className="absolute inset-0 luxury-logo-glow-hover"
+                  style={{
+                    background: `radial-gradient(circle at center, ${PremiumColors.LogoGlowHover}, ${PremiumColors.BlueGlowIntense}60, transparent 50%)`,
+                    filter: 'blur(30px) sm:blur(35px) lg:blur(40px)',
+                    opacity: 0,
+                    transform: 'scale(1.4) sm:scale(1.45) lg:scale(1.5)'
+                  }}
+                ></div>
+
+                {/* Outer Glow Spread */}
+                <div 
+                  className="absolute inset-0 luxury-logo-glow-outer"
+                  style={{
+                    background: `radial-gradient(circle at center, ${PremiumColors.ElectricBlueStart}20, ${PremiumColors.ElectricBlueEnd}15, transparent 80%)`,
+                    filter: 'blur(35px) sm:blur(40px) lg:blur(45px)',
+                    opacity: 0.4,
+                    transform: 'scale(1.6) sm:scale(1.7) lg:scale(1.8)'
+                  }}
+                ></div>
+                
+                {/* Main Logo - Responsive sizing */}
+                <img
+                  src={Logo}
+                  alt="VIZO Luxury"
+                  className="h-12 sm:h-14 md:h-16 lg:h-20 xl:h-24 transition-all duration-1000 luxury-logo-image relative z-30"
+                  style={{
+                    filter: 'brightness(1.2) contrast(1.15) saturate(1.1) drop-shadow(0 0 15px rgba(255,255,255,0.2)) sm:drop-shadow(0 0 20px rgba(255,255,255,0.3))'
+                  }}
+                />
               </div>
             </div>
-            
-            {/* User Section */}
-            <div className="flex items-center space-x-6">
-              {currentUser && currentUser.isAnonymous === false ? (
-                <button
-                  className="text-white hover:text-orange-300 transition-colors duration-200 relative"
-                  onClick={onLogout}
-                  title={t('logout')}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H9" />
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  className="text-white hover:text-orange-300 transition-colors duration-200"
-                  onClick={() => onNavigate('login')}
-                  title={t('login')}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </button>
+          </div>
+
+          {/* Right Navigation - Hidden on mobile */}
+          <div className="flex-1 hidden lg:flex justify-start items-center">
+            <div className="flex items-center gap-8 md:gap-12 lg:gap-[4.5rem]">
+              {isAdmin && (
+                <LuxuryNavButton
+                  onClick={() => onNavigate('admin')}
+                  text="ADMIN"
+                />
               )}
               
-              {/* Cart Button with Visible Badge */}
+              <LuxuryNavButton
+                onClick={() => onNavigate('contact')}
+                text="CONTACT"
+              />
+
+              {/* Luxury Cart Button */}
               <button
-                className="relative flex items-center space-x-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/30 cart-button"
+                className="luxury-cart-button relative group"
                 onClick={() => onNavigate('cart')}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                </svg>
-                <span className="font-outfit">{t('cart')}</span>
+                <span className="luxury-cart-text">CART</span>
                 {totalItemsInCart > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-white text-orange-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center font-outfit shadow-md border border-orange-200">
+                  <span className="luxury-cart-badge">
                     {totalItemsInCart}
                   </span>
                 )}
               </button>
             </div>
-          </nav>
+          </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Visible only on mobile */}
           <button
-            className="md:hidden text-white z-30"
+            className="lg:hidden text-white z-50 relative p-2 rounded-lg transition-all duration-300 hover:bg-white/5 luxury-mobile-menu-button"
             onClick={toggleMobileMenu}
+            style={{
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}
           >
             {isMobileMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
+            )}
+          </button>
+
+          {/* Mobile Cart Button - Visible only on mobile */}
+          <button
+            className="lg:hidden relative luxury-mobile-cart-icon"
+            onClick={() => onNavigate('cart')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+            </svg>
+            {totalItemsInCart > 0 && (
+              <span className="luxury-mobile-cart-badge">
+                {totalItemsInCart}
+              </span>
             )}
           </button>
         </div>
@@ -178,142 +215,353 @@ const Header = ({ onNavigate, isAdmin, currentUser, onLogout }) => {
 
       {/* Mobile Navigation Menu */}
       <div
-        className={`fixed inset-0 bg-[${VizoColors.PrimaryDarkBlur}] z-40 flex flex-col items-center justify-center transition-all duration-300 ease-in-out font-outfit ${
+        className={`fixed inset-0 z-40 flex flex-col items-center justify-center transition-all duration-500 ease-out lg:hidden ${
           isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
         }`}
+        style={{
+          backgroundColor: PremiumColors.DeepMatteBlack,
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          fontFamily: "'Outfit', 'Satoshi', 'Neue Montreal', sans-serif"
+        }}
       >
-        <div className="space-y-8 text-center">
-          <MobileNavButton 
+        {/* Ambient Electric Blue Mist */}
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            background: `radial-gradient(circle at 30% 50%, ${PremiumColors.ElectricBlueStart}25, transparent 50%),
+                         radial-gradient(circle at 70% 20%, ${PremiumColors.ElectricBlueEnd}15, transparent 50%)`,
+            filter: 'blur(60px)'
+          }}
+        ></div>
+
+        <div className="relative space-y-8 sm:space-y-10 text-center px-6 z-10 w-full max-w-sm">
+          <MobileNavButton
             onClick={() => handleMobileNavigate('home')}
-            text={t('home')}
+            text="HOME"
           />
-          <MobileNavButton 
+          <MobileNavButton
             onClick={() => handleMobileNavigate('products')}
-            text={t('products')}
+            text="SHOP"
           />
-          
+          <MobileNavButton
+            onClick={() => handleMobileNavigate('collections')}
+            text="COLLECTIONS"
+          />
+          <MobileNavButton
+            onClick={() => handleMobileNavigate('contact')}
+            text="CONTACT"
+          />
+
           {isAdmin && (
-            <MobileNavButton 
+            <MobileNavButton
               onClick={() => handleMobileNavigate('admin')}
-              text={t('admin')}
+              text="ADMIN"
             />
           )}
-          
+
           {currentUser && currentUser.isAnonymous === false ? (
-            <MobileNavButton 
+            <MobileNavButton
               onClick={() => { onLogout(); handleMobileNavigate('home'); }}
-              text={t('logout')}
+              text="LOGOUT"
             />
           ) : (
-            <MobileNavButton 
+            <MobileNavButton
               onClick={() => handleMobileNavigate('login')}
-              text={t('login')}
+              text="LOGIN"
             />
           )}
-          
+
+          {/* Mobile Cart Full Button */}
           <button
-            className="flex items-center justify-center mx-auto space-x-3 text-2xl font-medium text-white py-3 transition-colors hover:text-orange-300"
+            className="luxury-mobile-cart-full-button group"
             onClick={() => handleMobileNavigate('cart')}
           >
-            <span>{t('cart')}</span>
+            <span className="luxury-mobile-cart-text">CART</span>
             {totalItemsInCart > 0 && (
-              <span className="bg-orange-500 text-white text-sm font-bold rounded-full w-7 h-7 flex items-center justify-center">
+              <span className="luxury-mobile-cart-full-badge">
                 {totalItemsInCart}
               </span>
             )}
           </button>
-          
-          <div className="pt-8">
-            <select
-              className="bg-white/20 text-white py-2 px-4 rounded-lg border border-white/20 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 backdrop-blur-sm"
-              value={lang}
-              onChange={handleLanguageChange}
-            >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="ar">العربية</option>
-            </select>
-          </div>
         </div>
+
+        {/* Close Button for Mobile */}
+        <button
+          className="absolute top-6 right-6 text-white p-2 rounded-lg transition-all duration-300 hover:bg-white/5"
+          onClick={toggleMobileMenu}
+          style={{
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      {/* Global Styles */}
+      {/* Global Premium Styles */}
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-        
-        body {
-          font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-          background-color: ${VizoColors.OffWhiteBody};
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.cdnfonts.com/css/neue-montreal');
+
         .container {
-          max-width: 1280px;
+          max-width: 1400px;
           width: 100%;
           margin: 0 auto;
-          padding: 0 1rem;
-        }
-        
-        /* Custom select arrow for dark background */
-        select {
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-          background-position: right 0.5rem center;
-          background-repeat: no-repeat;
-          background-size: 1.5em 1.5em;
-          padding-right: 2.5rem;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-        }
-        
-        /* Smooth transitions for all interactive elements */
-        button, select, .nav-button {
-          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        
-        /* Subtle glow effect on cart button hover */
-        .cart-button:hover {
-          box-shadow: 0 5px 15px rgba(230, 107, 59, 0.4);
-          transform: translateY(-2px);
         }
 
-        /* Keyframe animation for the gradient line under the logo */
-        @keyframes gradient-move {
-          0% {
-            transform: translateX(-100%);
-            opacity: 0;
+        /* Enhanced Logo Floating Animation */
+        @keyframes luxuryFloat {
+          0%, 100% {
+            transform: translateY(-2px);
           }
-          25% {
-            opacity: 1;
-          }
-          75% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(100%);
-            opacity: 0;
+          50% {
+            transform: translateY(2px);
           }
         }
 
-        .animate-gradient-line {
-          animation: gradient-move 3s linear infinite; /* Adjust duration for desired speed */
+        @keyframes glowPulse {
+          0%, 100% {
+            opacity: 0.7;
+          }
+          50% {
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes glowPulseDelayed {
+          0%, 100% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 0.8;
+          }
+        }
+
+        .luxury-logo-float {
+          animation: luxuryFloat 4s ease-in-out infinite;
+          transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .glowing-aura {
+          animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        .glowing-aura-delayed {
+          animation: glowPulseDelayed 3.5s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+
+        /* Enhanced Logo Glow Interactions */
+        .luxury-logo-container:hover .luxury-logo-float {
+          animation-duration: 3s;
+        }
+
+        .luxury-logo-container:hover .luxury-logo-glow-hover {
+          opacity: 1;
+          animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        .luxury-logo-container:hover .luxury-logo-glow-base {
+          opacity: 1;
+        }
+
+        .luxury-logo-container:hover .luxury-logo-blue-aura {
+          opacity: 0.9;
+        }
+
+        .luxury-logo-container:hover .luxury-logo-glow-outer {
+          opacity: 0.6;
+        }
+
+        .luxury-logo-container:hover .luxury-logo-image {
+          filter: brightness(1.3) contrast(1.2) saturate(1.15) drop-shadow(0 0 25px rgba(255,255,255,0.3)) !important;
+        }
+
+        /* Premium Typography */
+        .luxury-nav-text {
+          font-family: 'Outfit', 'Satoshi', 'Neue Montreal', sans-serif;
+          font-weight: 500;
+          font-size: 0.9rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: ${PremiumColors.PureWhite};
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Luxury Cart Button */
+        .luxury-cart-button {
+          display: flex;
+          align-items: center;
+          padding: 0.6rem 0;
+          background: transparent;
+          border: none;
+          color: ${PremiumColors.PureWhite};
+          position: relative;
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .luxury-cart-button:hover {
+          color: ${PremiumColors.TextHover};
+          transform: translateY(-1px);
+        }
+
+        .luxury-cart-text {
+          font-family: 'Outfit', 'Satoshi', 'Neue Montreal', sans-serif;
+          font-weight: 500;
+          font-size: 0.9rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+
+        .luxury-cart-badge {
+          position: absolute;
+          top: -6px;
+          right: -10px;
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          color: ${PremiumColors.DeepMatteBlack};
+          font-size: 0.65rem;
+          font-weight: 600;
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid ${PremiumColors.DeepMatteBlack};
+          font-family: 'Outfit', sans-serif;
+        }
+
+        /* Mobile Cart Icon */
+        .luxury-mobile-cart-icon {
+          color: ${PremiumColors.PureWhite};
+          padding: 0.5rem;
+          border-radius: 8px;
+          transition: all 0.3s ease-out;
+          margin-right: 0.5rem;
+        }
+
+        .luxury-mobile-cart-icon:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .luxury-mobile-cart-badge {
+          position: absolute;
+          top: 2px;
+          right: 2px;
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          color: ${PremiumColors.DeepMatteBlack};
+          font-size: 0.6rem;
+          font-weight: 600;
+          border-radius: 50%;
+          width: 14px;
+          height: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid ${PremiumColors.DeepMatteBlack};
+          font-family: 'Outfit', sans-serif;
+        }
+
+        /* Mobile Cart Full Button */
+        .luxury-mobile-cart-full-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          padding: 1.2rem 2rem;
+          border-radius: 12px;
+          transition: all 0.5s ease-out;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(15px);
+          color: ${PremiumColors.PureWhite};
+          font-family: 'Outfit', sans-serif;
+          font-weight: 500;
+          font-size: 1.1rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-top: 1rem;
+        }
+
+        .luxury-mobile-cart-full-button:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(0, 157, 255, 0.4);
+          transform: scale(1.05);
+          box-shadow: 0 8px 30px rgba(0, 157, 255, 0.2);
+        }
+
+        .luxury-mobile-cart-text {
+          font-family: 'Outfit', sans-serif;
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+
+        .luxury-mobile-cart-full-badge {
+          background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+          color: ${PremiumColors.DeepMatteBlack};
+          font-size: 0.8rem;
+          font-weight: 600;
+          border-radius: 50%;
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid ${PremiumColors.DeepMatteBlack};
+        }
+
+        /* Mobile Menu Button */
+        .luxury-mobile-menu-button {
+          color: ${PremiumColors.PureWhite};
+        }
+
+        .luxury-mobile-menu-button:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Enhanced smooth transitions */
+        * {
+          transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
       `}</style>
     </>
   );
 };
 
-// Reusable NavButton Component for Desktop
-const NavButton = ({ onClick, text }) => (
+// Premium Luxury NavButton Component
+const LuxuryNavButton = ({ onClick, text }) => (
   <button
     onClick={onClick}
-    className="relative py-1 px-2 overflow-hidden group nav-button"
+    className="relative py-2 px-1 overflow-hidden luxury-nav-button group"
+    style={{
+      background: 'transparent',
+      border: 'none'
+    }}
   >
-    <span className="text-lg font-medium text-white relative z-10 transition-colors duration-300 group-hover:text-orange-300">
+    <span className="luxury-nav-text group-hover:opacity-70">
       {text}
     </span>
-    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-yellow-400 transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>
+    
+    {/* Elegant Gradient Underline */}
+    <div 
+      className="absolute bottom-0 left-0 w-full h-px transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"
+      style={{
+        background: `linear-gradient(90deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd})`,
+        boxShadow: `0 0 12px rgba(0, 157, 255, 0.2)`
+      }}
+    ></div>
+
+    {/* Subtle Background Glow on Hover */}
+    <div 
+      className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"
+      style={{
+        background: `linear-gradient(135deg, rgba(0, 157, 255, 0.04), rgba(0, 255, 224, 0.02))`,
+      }}
+    ></div>
   </button>
 );
 
@@ -321,10 +569,33 @@ const NavButton = ({ onClick, text }) => (
 const MobileNavButton = ({ onClick, text }) => (
   <button
     onClick={onClick}
-    className="text-2xl font-medium text-white py-3 transition-colors duration-300 hover:text-orange-300 relative"
+    className="relative py-4 px-8 rounded-xl transition-all duration-500 luxury-mobile-nav group w-full"
+    style={{
+      color: PremiumColors.PureWhite,
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      background: 'rgba(255, 255, 255, 0.02)',
+      backdropFilter: 'blur(10px)'
+    }}
   >
-    {text}
-    <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-yellow-400 transition-all duration-500 group-hover:w-full transform -translate-x-1/2"></div>
+    <span 
+      className="text-lg sm:text-xl font-medium tracking-widest uppercase transition-all duration-500 group-hover:opacity-70"
+      style={{
+        fontFamily: "'Outfit', 'Satoshi', 'Neue Montreal', sans-serif",
+        letterSpacing: '0.1em'
+      }}
+    >
+      {text}
+    </span>
+    
+    {/* Mobile Hover Effect */}
+    <div 
+      className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"
+      style={{
+        background: `linear-gradient(135deg, rgba(0, 157, 255, 0.08), rgba(0, 255, 224, 0.05))`,
+        border: '1px solid rgba(0, 157, 255, 0.2)',
+        boxShadow: `0 0 30px rgba(0, 157, 255, 0.1)`
+      }}
+    ></div>
   </button>
 );
 

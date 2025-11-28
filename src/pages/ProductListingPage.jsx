@@ -1,485 +1,938 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
-import { useLanguage } from '../context/LanguageContext';
+ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+  import ProductCard from '../components/ProductCard';
+  import { useLanguage } from '../context/LanguageContext';
+  import products from '../data/products';
 
-// Updated to VizoColors palette
-const VizoColors = {
-  PrimaryBlue: '#1A3A4A',
-  AccentOrange: '#E66B3B',
-  LightGrey: '#F0F2F5',
-  DarkText: '#333333',
-  LightText: '#FFFFFF',
-  NeutralBlue: '#6A8DAD',
-  OffWhite: '#F9F9F9',
-  ContrastDark: '#245F73',
-  ContrastAccent: '#733224',
-  SoftHighlight: '#BBBDBC',
-};
-
-const ProductListingPage = ({ products, onAddToCart, onNavigate }) => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortOption, setSortOption] = useState('default');
-  const [displayedProductCount, setDisplayedProductCount] = useState(12);
-  const { t } = useLanguage();
-  const canvasRef = useRef(null);
-  const animationRef = useRef(null);
-  const headerRef = useRef(null);
-
-  useEffect(() => {
-    // Canvas animation remains similar but uses VizoColors
-    const initCanvasAnimation = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      
-      let particles = [];
-      const particleCount = 150;
-      
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 2 + 0.5,
-          speedX: (Math.random() - 0.5) * 0.3,
-          speedY: (Math.random() - 0.5) * 0.3,
-          color: `rgba(106, 141, 173, ${Math.random() * 0.3 + 0.1})` // NeutralBlue
-        });
-      }
-      
-      const animate = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(p => {
-          p.x += p.speedX;
-          p.y += p.speedY;
-          
-          if (p.x > canvas.width || p.x < 0) p.speedX = -p.speedX;
-          if (p.y > canvas.height || p.y < 0) p.speedY = -p.speedY;
-          
-          const gradient = ctx.createRadialGradient(
-            p.x, p.y, 0, 
-            p.x, p.y, p.radius * 5
-          );
-          gradient.addColorStop(0, p.color);
-          gradient.addColorStop(1, 'rgba(106, 141, 173, 0)');
-          
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius * 5, 0, Math.PI * 2);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        });
-        
-        animationRef.current = requestAnimationFrame(animate);
-      };
-      
-      animate();
-    };
-
-    initCanvasAnimation();
-
-    const handleResize = () => {
-      if (canvasRef.current) {
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationRef.current);
-    };
-  }, []);
-
-  // Simplified clothing categories with more visible icons
-  const categories = useMemo(() => [
-    { id: 'All', name: 'All Items', icon: '👕' },
-    { id: 'Shorts', name: 'Shorts', icon: '🩳' },
-    { id: 'Tops', name: 'Tops', icon: '👚' },
-    { id: 'Outerwear', name: 'Outerwear', icon: '🧥' },
-    { id: 'Footwear', name: 'Footwear', icon: '👟' },
-    { id: 'Accessories', name: 'Accessories', icon: '🕶️' },
-  ], []);
-  
-  const sortOptions = useMemo(() => [
-    { value: 'default', label: 'Recommended' },
-    { value: 'price-asc', label: 'Price: Low to High' },
-    { value: 'price-desc', label: 'Price: High to Low' },
-    { value: 'newest', label: 'Newest Arrivals' },
-  ], []);
-
-  const filteredAndSortedProducts = useMemo(() => {
-    let currentProducts = [...products];
-    
-    if (selectedCategory !== 'All') {
-      currentProducts = currentProducts.filter(p => p.category === selectedCategory);
-    }
-    
-    if (searchTerm) {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      currentProducts = currentProducts.filter(p =>
-        p.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-        (p.description && p.description.toLowerCase().includes(lowerCaseSearchTerm))
-      );
-    }
-    
-    switch (sortOption) {
-      case 'price-asc': currentProducts.sort((a, b) => a.price - b.price); break;
-      case 'price-desc': currentProducts.sort((a, b) => b.price - a.price); break;
-      case 'newest': currentProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
-      default: currentProducts.sort((a, b) => a.id.localeCompare(b.id));
-    }
-    
-    return currentProducts;
-  }, [products, selectedCategory, searchTerm, sortOption]);
-
-  const handleLoadMore = () => {
-    setDisplayedProductCount(prev => prev + 8);
+  // Premium Luxury Color Palette
+  const PremiumColors = {
+    DeepMatteBlack: '#000000',
+    PureWhite: '#FFFFFF',
+    ElectricBlueStart: '#009DFF',
+    ElectricBlueEnd: '#00FFE0',
+    TextHover: 'rgba(255, 255, 255, 0.7)',
+    GlassWhite: 'rgba(255, 255, 255, 0.05)',
+    GlassBorder: 'rgba(255, 255, 255, 0.08)',
+    BlueGlowIntense: 'rgba(0, 157, 255, 0.4)',
+    AmbientMist: 'rgba(0, 157, 255, 0.03)',
+    CoolGray: '#B0B0B0',
+    Platinum: '#E5E5E5',
+    MetallicGray: '#1A1A1A'
   };
 
-  const renderFloatingHeader = () => (
-    <div 
-      ref={headerRef}
-      className="fixed top-0 left-0 w-full py-4 px-8 z-50 transition-all duration-500 backdrop-blur-lg bg-white/90 border-b"
-      style={{ 
-        backgroundColor: VizoColors.OffWhite,
-        borderColor: VizoColors.SoftHighlight,
-        transform: 'translateY(-100%)', 
-        opacity: 0 
-      }}
-    >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center">
-          <div className="text-2xl font-bold" style={{ color: VizoColors.PrimaryBlue }}>VIZO</div>
-          <div className="ml-8 flex space-x-6">
-            {categories.slice(0, 4).map(category => (
+  const ProductListingPage = ({ onAddToCart }) => {
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOption, setSortOption] = useState('default');
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const { t } = useLanguage();
+    const headerRef = useRef(null);
+    const gridRef = useRef(null);
+
+    const allProducts = products;
+
+    useEffect(() => {
+      if (headerRef.current) {
+        headerRef.current.style.transform = 'translateY(0%)';
+        headerRef.current.style.opacity = '1';
+      }
+    }, []);
+
+    // Add scroll animation for product cards
+    
+    const categories = useMemo(() => [
+      { id: 'All', name: 'ALL PRODUCTS', icon: '👕' },
+      { id: 'Tops', name: 'TOPS', icon: '👚' },
+      { id: 'Bottoms', name: 'BOTTOMS', icon: '👖' },
+      { id: 'Dresses', name: 'DRESSES', icon: '👗' },
+    ], []);
+
+    const sortOptions = useMemo(() => [
+      { value: 'default', label: 'RECOMMENDED' },
+      { value: 'price-asc', label: 'PRICE: LOW TO HIGH' },
+      { value: 'price-desc', label: 'PRICE: HIGH TO LOW' },
+      { value: 'newest', label: 'NEWEST ARRIVALS' },
+    ], []);
+
+    const filteredAndSortedProducts = useMemo(() => {
+      let currentProducts = [...allProducts];
+
+      if (selectedCategory !== 'All') {
+        currentProducts = currentProducts.filter(p => p.category === selectedCategory);
+      }
+
+      if (searchTerm) {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        currentProducts = currentProducts.filter(p =>
+          p.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (p.description && p.description.toLowerCase().includes(lowerCaseSearchTerm))
+        );
+      }
+
+      switch (sortOption) {
+        case 'price-asc': currentProducts.sort((a, b) => a.price - b.price); break;
+        case 'price-desc': currentProducts.sort((a, b) => b.price - a.price); break;
+        case 'newest':
+          currentProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+          break;
+        default: currentProducts.sort((a, b) => a.id.localeCompare(b.id));
+      }
+
+      return currentProducts;
+    }, [allProducts, selectedCategory, searchTerm, sortOption]);
+
+    useEffect(() => {
+
+      const observer = new IntersectionObserver(
+
+        (entries) => {
+
+          entries.forEach((entry) => {
+
+            if (entry.isIntersecting) {
+
+              entry.target.style.opacity = '1';
+
+              entry.target.style.transform = 'translateY(0)';
+
+            }
+
+          });
+
+        },
+
+        { threshold: 0.1 }
+
+      );
+
+
+
+      const cards = gridRef.current?.querySelectorAll('.luxury-product-item');
+
+      cards?.forEach((card) => observer.observe(card));
+
+
+
+      return () => observer.disconnect();
+
+    }, [filteredAndSortedProducts]);
+
+    const handleApplyFilters = useCallback(() => {
+      setIsFilterModalOpen(false);
+    }, []);
+
+    const handleClearFilters = useCallback(() => {
+      setSelectedCategory('All');
+      setSearchTerm('');
+      setSortOption('default');
+      setIsFilterModalOpen(false);
+    }, []);
+
+    const renderLuxuryHeader = () => (
+      <div
+        ref={headerRef}
+        className="luxury-page-header"
+        style={{
+          fontFamily: "'Clash Display', 'Satoshi', 'Outfit', sans-serif"
+        }}
+      >
+        <div className="luxury-header-content">
+          <div className="luxury-header-brand">
+            <div className="luxury-header-logo">
+              VIZO
+            </div>
+            <div className="luxury-header-subtitle">
+              LUXURY BOUTIQUE
+            </div>
+          </div>
+          
+          <div className="luxury-header-actions">
+            <button
+              onClick={() => setIsFilterModalOpen(true)}
+              className="luxury-filter-button"
+            >
+              <span className="luxury-filter-icon">⚙️</span>
+              <span className="luxury-filter-text">FILTER & SORT</span>
+              <div className="luxury-button-glow"></div>
+            </button>
+          </div>
+        </div>
+
+        <style jsx>{`
+          .luxury-page-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            z-index: 50;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid ${PremiumColors.GlassBorder};
+          }
+
+          .luxury-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .luxury-header-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .luxury-header-logo {
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: ${PremiumColors.PureWhite};
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+          }
+
+          .luxury-header-subtitle {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 400;
+            font-size: 0.8rem;
+            color: ${PremiumColors.CoolGray};
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+          }
+
+          .luxury-filter-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid ${PremiumColors.GlassBorder};
+            border-radius: 12px;
+            color: ${PremiumColors.PureWhite};
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            cursor: pointer;
+          }
+
+          .luxury-filter-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: ${PremiumColors.ElectricBlueStart};
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 157, 255, 0.2);
+          }
+
+          .luxury-filter-icon {
+            font-size: 1.1rem;
+          }
+
+          .luxury-filter-text {
+            position: relative;
+            z-index: 2;
+          }
+
+          .luxury-button-glow {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+          }
+
+          .luxury-filter-button:hover .luxury-button-glow {
+            left: 100%;
+          }
+
+          @media (max-width: 768px) {
+            .luxury-page-header {
+              padding: 1rem 1.5rem;
+            }
+            
+            .luxury-header-logo {
+              font-size: 1.5rem;
+            }
+            
+            .luxury-filter-button {
+              padding: 0.75rem 1.5rem;
+              font-size: 0.8rem;
+            }
+          }
+        `}</style>
+      </div>
+    );
+
+    const renderLuxuryFilterModal = () => {
+      if (!isFilterModalOpen) return null;
+
+      return (
+        <div className="luxury-filter-modal-overlay">
+          <div className="luxury-filter-modal">
+            <div className="luxury-modal-header">
+              <h2 className="luxury-modal-title">FILTER & SORT</h2>
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 ${
-                  selectedCategory === category.id 
-                    ? 'text-white' 
-                    : 'text-gray-700 hover:text-' + VizoColors.AccentOrange.replace('#', '')
-                }`}
-                style={{
-                  backgroundColor: selectedCategory === category.id 
-                    ? VizoColors.AccentOrange 
-                    : 'transparent'
-                }}
+                onClick={() => setIsFilterModalOpen(false)}
+                className="luxury-modal-close"
+                aria-label="Close"
               >
-                <span className="mr-1 text-lg">{category.icon}</span>
-                {category.name}
+                <svg className="luxury-close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-            ))}
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Find clothing items..."
-              className="bg-white border rounded-full py-2 px-4 placeholder-gray-400 focus:outline-none focus:ring-1 w-64"
-              style={{ 
-                borderColor: VizoColors.SoftHighlight,
-                color: VizoColors.DarkText
-              }}
-            />
-            <div className="absolute right-3 top-2.5" style={{ color: VizoColors.AccentOrange }}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
-  const renderProductBanner = () => (
-    <section className="relative w-full h-screen min-h-[600px] overflow-hidden flex items-center justify-center">
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 z-0"
-        style={{ backgroundColor: VizoColors.PrimaryBlue }}
-      />
-      
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 to-white/10"></div>
-      
-      <div className="relative z-20 h-full flex flex-col justify-center items-center text-center px-4 pt-20">
-        <div className="mb-8">
-          <div 
-            className="inline-block px-6 py-2 rounded-full mb-6 text-white font-medium"
-            style={{ backgroundColor: VizoColors.AccentOrange }}
-          >
-            Premium Collection
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-            <span className="block">Curated</span>
-            <span className="block mt-2" style={{ color: VizoColors.AccentOrange }}>
-              Fashion Selection
-            </span>
-          </h1>
-          
-          <div className="w-64 h-1 mx-auto my-8" style={{ backgroundColor: VizoColors.AccentOrange }}></div>
-          
-          <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto text-white">
-            Discover premium clothing crafted for style and comfort
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-
-  const renderFilterSortControls = () => (
-    <section className="relative z-30 -mt-20">
-      <div className="container mx-auto px-4 md:px-8">
-        <div 
-          className="rounded-2xl p-8 shadow-xl"
-          style={{ 
-            backgroundColor: VizoColors.OffWhite,
-            border: `1px solid ${VizoColors.SoftHighlight}`
-          }}
-        >
-          <div className="flex flex-col md:flex-row justify-between gap-8">
-            {/* Category Filter */}
-            <div className="flex-1">
-              <h3 
-                className="text-lg font-semibold mb-4 pl-2"
-                style={{ color: VizoColors.PrimaryBlue }}
-              >
-                Categories
-              </h3>
-              <div className="flex flex-wrap gap-3">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => {
-                      setSelectedCategory(category.id);
-                      setDisplayedProductCount(12);
-                    }}
-                    className={`flex items-center justify-center p-4 rounded-xl transition-all duration-300 ${
-                      selectedCategory === category.id
-                        ? 'shadow-lg'
-                        : 'hover:bg-gray-100'
-                    }`}
-                    style={{
-                      backgroundColor: selectedCategory === category.id 
-                        ? VizoColors.AccentOrange 
-                        : 'white',
-                      color: selectedCategory === category.id 
-                        ? 'white' 
-                        : VizoColors.DarkText,
-                      border: `1px solid ${VizoColors.SoftHighlight}`
-                    }}
-                  >
-                    <span className="mr-2 text-2xl">{category.icon}</span>
-                    <span className="font-medium">{category.name}</span>
-                  </button>
-                ))}
+            <div className="luxury-modal-content">
+              <div className="luxury-filter-section">
+                <h3 className="luxury-section-title">CATEGORIES</h3>
+                <div className="luxury-categories-grid">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className={`luxury-category-button ${selectedCategory === category.id ? 'luxury-category-active' : ''}`}
+                    >
+                      <span className="luxury-category-icon">{category.icon}</span>
+                      <span className="luxury-category-name">{category.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Search and Sort */}
-            <div className="flex-1 space-y-6">
-              <div>
-                <h3 
-                  className="text-lg font-semibold mb-4"
-                  style={{ color: VizoColors.PrimaryBlue }}
-                >
-                  Refine Selection
-                </h3>
-                <div className="relative">
+              <div className="luxury-filter-section">
+                <h3 className="luxury-section-title">SEARCH PRODUCTS</h3>
+                <div className="luxury-search-container">
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setDisplayedProductCount(12);
-                    }}
-                    placeholder="Find clothing items..."
-                    className="w-full px-4 py-3 bg-white border rounded-xl placeholder-gray-400 focus:outline-none focus:ring-1"
-                    style={{ 
-                      borderColor: VizoColors.SoftHighlight,
-                      color: VizoColors.DarkText
-                    }}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by name or description..."
+                    className="luxury-search-input"
                   />
-                  <div className="absolute right-3 top-3.5" style={{ color: VizoColors.AccentOrange }}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  <div className="luxury-search-icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
-              
-              <div>
-                <div className="flex items-center justify-between">
-                  <h3 
-                    className="text-lg font-semibold"
-                    style={{ color: VizoColors.PrimaryBlue }}
-                  >
-                    Sort By
-                  </h3>
-                  <button 
-                    className="text-sm hover:underline"
-                    style={{ color: VizoColors.AccentOrange }}
-                    onClick={() => {
-                      setSortOption('default');
-                      setDisplayedProductCount(12);
-                    }}
-                  >
-                    Reset
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+
+              <div className="luxury-filter-section">
+                <h3 className="luxury-section-title">SORT BY</h3>
+                <div className="luxury-sort-grid">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => setSortOption(option.value)}
-                      className={`p-3 rounded-xl text-center transition-all duration-300 ${
-                        sortOption === option.value
-                          ? 'shadow-lg'
-                          : 'hover:bg-gray-100'
-                      }`}
-                      style={{
-                        backgroundColor: sortOption === option.value 
-                          ? VizoColors.AccentOrange 
-                          : 'white',
-                        color: sortOption === option.value 
-                          ? 'white' 
-                          : VizoColors.DarkText,
-                        border: `1px solid ${VizoColors.SoftHighlight}`
-                      }}
+                      className={`luxury-sort-button ${sortOption === option.value ? 'luxury-sort-active' : ''}`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
               </div>
+
+              <div className="luxury-modal-actions">
+                <button
+                  onClick={handleClearFilters}
+                  className="luxury-clear-button"
+                >
+                  RESET FILTERS
+                </button>
+                <button
+                  onClick={handleApplyFilters}
+                  className="luxury-apply-button"
+                >
+                  APPLY FILTERS
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
 
-  const renderProductGrid = () => (
-    <section className="container mx-auto px-4 md:px-8 py-16 relative z-20">
-      <div 
-        className="flex justify-between items-center mb-12 pb-6"
-        style={{ borderBottom: `1px solid ${VizoColors.SoftHighlight}` }}
-      >
-        <h2 className="text-3xl font-bold" style={{ color: VizoColors.PrimaryBlue }}>
-          {selectedCategory === 'All' ? 'All Items' : categories.find(c => c.id === selectedCategory)?.name}
-          <span className="ml-4" style={{ color: VizoColors.AccentOrange }}>
-            {filteredAndSortedProducts.length} items
-          </span>
-        </h2>
-        
-        <div style={{ color: VizoColors.DarkText }}>
-          Showing {Math.min(displayedProductCount, filteredAndSortedProducts.length)} of {filteredAndSortedProducts.length}
+          <style jsx>{`
+            .luxury-filter-modal-overlay {
+              position: fixed;
+              inset: 0;
+              z-index: 100;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: rgba(0, 0, 0, 0.8);
+              backdrop-filter: blur(10px);
+              animation: luxuryFadeIn 0.3s ease-out;
+            }
+
+            .luxury-filter-modal {
+              width: 90%;
+              max-width: 600px;
+              background: rgba(10, 10, 10, 0.9);
+              backdrop-filter: blur(30px);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              border-radius: 24px;
+              overflow: hidden;
+              animation: luxuryScaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+              box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            }
+
+            .luxury-modal-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 2rem 2rem 1rem 2rem;
+              border-bottom: 1px solid ${PremiumColors.GlassBorder};
+            }
+
+            .luxury-modal-title {
+              font-family: 'Clash Display', sans-serif;
+              font-weight: 700;
+              font-size: 1.5rem;
+              color: ${PremiumColors.PureWhite};
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+            }
+
+            .luxury-modal-close {
+              padding: 0.5rem;
+              border-radius: 8px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              color: ${PremiumColors.PureWhite};
+              transition: all 0.3s ease;
+              cursor: pointer;
+            }
+
+            .luxury-modal-close:hover {
+              background: rgba(255, 255, 255, 0.1);
+              border-color: ${PremiumColors.ElectricBlueStart};
+            }
+
+            .luxury-close-icon {
+              width: 1.5rem;
+              height: 1.5rem;
+            }
+
+            .luxury-modal-content {
+              padding: 2rem;
+              max-height: 70vh;
+              overflow-y: auto;
+            }
+
+            .luxury-filter-section {
+              margin-bottom: 2.5rem;
+            }
+
+            .luxury-section-title {
+              font-family: 'Clash Display', sans-serif;
+              font-weight: 600;
+              font-size: 1rem;
+              color: ${PremiumColors.PureWhite};
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+              margin-bottom: 1.5rem;
+              padding-bottom: 0.5rem;
+              border-bottom: 1px solid ${PremiumColors.GlassBorder};
+            }
+
+            .luxury-categories-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+              gap: 1rem;
+            }
+
+            .luxury-category-button {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 0.75rem;
+              padding: 1.5rem 1rem;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              border-radius: 12px;
+              color: ${PremiumColors.CoolGray};
+              transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+              cursor: pointer;
+            }
+
+            .luxury-category-button:hover {
+              background: rgba(255, 255, 255, 0.1);
+              border-color: ${PremiumColors.ElectricBlueStart};
+              transform: translateY(-2px);
+            }
+
+            .luxury-category-active {
+              background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}20, ${PremiumColors.ElectricBlueEnd}15);
+              border-color: ${PremiumColors.ElectricBlueStart};
+              color: ${PremiumColors.PureWhite};
+              box-shadow: 0 8px 25px rgba(0, 157, 255, 0.2);
+            }
+
+            .luxury-category-icon {
+              font-size: 1.5rem;
+            }
+
+            .luxury-category-name {
+              font-family: 'Satoshi', sans-serif;
+              font-weight: 600;
+              font-size: 0.8rem;
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+            }
+
+            .luxury-search-container {
+              position: relative;
+            }
+
+            .luxury-search-input {
+              width: 100%;
+              padding: 1.25rem 3rem 1.25rem 1.5rem;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              border-radius: 12px;
+              color: ${PremiumColors.PureWhite};
+              font-family: 'Satoshi', sans-serif;
+              font-size: 1rem;
+              transition: all 0.3s ease;
+            }
+
+            .luxury-search-input:focus {
+              outline: none;
+              border-color: ${PremiumColors.ElectricBlueStart};
+              background: rgba(255, 255, 255, 0.08);
+              box-shadow: 0 0 20px rgba(0, 157, 255, 0.2);
+            }
+
+            .luxury-search-input::placeholder {
+              color: ${PremiumColors.CoolGray};
+            }
+
+            .luxury-search-icon {
+              position: absolute;
+              right: 1.25rem;
+              top: 50%;
+              transform: translateY(-50%);
+              color: ${PremiumColors.ElectricBlueStart};
+            }
+
+            .luxury-search-icon svg {
+              width: 1.25rem;
+              height: 1.25rem;
+            }
+
+            .luxury-sort-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 1rem;
+            }
+
+            .luxury-sort-button {
+              padding: 1.25rem 1.5rem;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              border-radius: 12px;
+              color: ${PremiumColors.CoolGray};
+              font-family: 'Satoshi', sans-serif;
+              font-weight: 500;
+              font-size: 0.9rem;
+              transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+              cursor: pointer;
+            }
+
+            .luxury-sort-button:hover {
+              background: rgba(255, 255, 255, 0.1);
+              border-color: ${PremiumColors.ElectricBlueStart};
+              transform: translateY(-2px);
+            }
+
+            .luxury-sort-active {
+              background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}20, ${PremiumColors.ElectricBlueEnd}15);
+              border-color: ${PremiumColors.ElectricBlueStart};
+              color: ${PremiumColors.PureWhite};
+              box-shadow: 0 8px 25px rgba(0, 157, 255, 0.2);
+            }
+
+            .luxury-modal-actions {
+              display: flex;
+              gap: 1rem;
+              padding-top: 2rem;
+              border-top: 1px solid ${PremiumColors.GlassBorder};
+            }
+
+            .luxury-clear-button, .luxury-apply-button {
+              flex: 1;
+              padding: 1.25rem 2rem;
+              border: none;
+              border-radius: 12px;
+              font-family: 'Clash Display', sans-serif;
+              font-weight: 600;
+              font-size: 0.9rem;
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+              transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+              cursor: pointer;
+            }
+
+            .luxury-clear-button {
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid ${PremiumColors.GlassBorder};
+              color: ${PremiumColors.PureWhite};
+            }
+
+            .luxury-clear-button:hover {
+              background: rgba(255, 255, 255, 0.1);
+              border-color: ${PremiumColors.ElectricBlueStart};
+              transform: translateY(-2px);
+            }
+
+            .luxury-apply-button {
+              background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+              color: ${PremiumColors.PureWhite};
+              box-shadow: 0 4px 20px rgba(0, 157, 255, 0.3);
+            }
+
+            .luxury-apply-button:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 8px 30px rgba(0, 157, 255, 0.5);
+            }
+
+            @keyframes luxuryFadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+
+            @keyframes luxuryScaleIn {
+              from { transform: scale(0.9); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+
+            @media (max-width: 768px) {
+              .luxury-filter-modal {
+                width: 95%;
+                margin: 1rem;
+              }
+              
+              .luxury-modal-content {
+                padding: 1.5rem;
+              }
+              
+              .luxury-categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+              }
+              
+              .luxury-sort-grid {
+                grid-template-columns: 1fr;
+              }
+              
+              .luxury-modal-actions {
+                flex-direction: column;
+              }
+            }
+          `}</style>
         </div>
-      </div>
-      
-      {filteredAndSortedProducts.length === 0 ? (
-        <div 
-          className="text-center py-20 rounded-2xl shadow-xl"
-          style={{ 
-            backgroundColor: VizoColors.OffWhite,
-            border: `1px solid ${VizoColors.SoftHighlight}`
-          }}
-        >
-          <div className="text-5xl mb-4" style={{ color: VizoColors.AccentOrange }}>🕳️</div>
-          <h3 className="text-2xl font-bold mb-2" style={{ color: VizoColors.AccentOrange }}>
-            No items match your criteria
-          </h3>
-          <p className="text-lg max-w-md mx-auto" style={{ color: VizoColors.DarkText }}>
-            Try adjusting your filters or search terms
-          </p>
-          <button
-            onClick={() => {
-              setSelectedCategory('All');
-              setSearchTerm('');
-              setSortOption('default');
-            }}
-            className="mt-6 px-6 py-3 rounded-full font-bold"
-            style={{ 
-              backgroundColor: VizoColors.AccentOrange,
-              color: 'white'
-            }}
-          >
-            Reset All Filters
-          </button>
+      );
+    };
+
+    const renderLuxuryProductGrid = () => (
+      <section className="luxury-product-grid-section">
+        {/* Ambient Background Effects */}
+        <div className="luxury-grid-background">
+          <div className="luxury-grid-glow-1"></div>
+          <div className="luxury-grid-glow-2"></div>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredAndSortedProducts.slice(0, displayedProductCount).map((product, index) => (
-              <div
-                key={product.id}
-                className="transform transition-all duration-500 hover:-translate-y-2"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <ProductCard
-                  product={product}
-                  onAddToCart={onAddToCart}
-                  onNavigate={onNavigate}
-                  theme="light"
-                />
+
+        <div className="luxury-grid-container">
+          <div className="luxury-grid-header">
+            <div className="luxury-grid-title-section">
+              <h2 className="luxury-grid-title">
+                {selectedCategory === 'All' ? 'ALL PRODUCTS' : categories.find(c => c.id === selectedCategory)?.name}
+              </h2>
+              <div className="luxury-grid-count">
+                <span className="luxury-count-number">{filteredAndSortedProducts.length}</span>
+                <span className="luxury-count-label">ITEMS</span>
               </div>
-            ))}
+            </div>
+            
+            
           </div>
 
-          {displayedProductCount < filteredAndSortedProducts.length && (
-            <div className="text-center mt-16">
+          {filteredAndSortedProducts.length === 0 ? (
+            <div className="luxury-empty-state">
+              <div className="luxury-empty-icon">🕳️</div>
+              <h3 className="luxury-empty-title">NO MATCHING ITEMS FOUND</h3>
+              <p className="luxury-empty-description">
+                Try adjusting your filters or search terms to find what you're looking for.
+              </p>
               <button
-                onClick={handleLoadMore}
-                className="relative px-8 py-4 bg-transparent rounded-full text-lg font-bold group overflow-hidden"
-                style={{ 
-                  border: `1px solid ${VizoColors.AccentOrange}`,
-                  color: VizoColors.AccentOrange
-                }}
+                onClick={handleClearFilters}
+                className="luxury-empty-button"
               >
-                View More Items
+                RESET ALL FILTERS
               </button>
             </div>
+          ) : (
+            <div ref={gridRef} className="luxury-products-grid">
+              {filteredAndSortedProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="luxury-product-item"
+                  style={{ 
+                    animationDelay: `${index * 0.05}s`,
+                    opacity: 0,
+                    transform: 'translateY(30px)',
+                    transition: `all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${index * 0.05}s`
+                  }}
+                >
+                  <ProductCard
+                    product={product}
+                    onAddToCart={onAddToCart}
+                  />
+                </div>
+              ))}
+            </div>
           )}
-        </>
-      )}
-    </section>
-  );
+        </div>
 
-  return (
-    <div 
-      className="flex flex-col w-full overflow-x-hidden"
-      style={{ backgroundColor: VizoColors.OffWhite, color: VizoColors.DarkText }}
-    >
-      {renderFloatingHeader()}
-      {renderProductBanner()}
-      {renderFilterSortControls()}
-      {renderProductGrid()}
-      
-      <style jsx="true">{`
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
-        }
-        
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
-        }
-      `}</style>
-    </div>
-  );
-};
+        <style jsx>{`
+          .luxury-product-grid-section {
+            position: relative;
+            min-height: 100vh;
+            padding: 8rem 2rem 4rem 2rem;
+            background: ${PremiumColors.DeepMatteBlack};
+            overflow: hidden;
+          }
 
-export default ProductListingPage;
+          .luxury-grid-background {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+          }
+
+          .luxury-grid-glow-1 {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, ${PremiumColors.ElectricBlueStart}05, transparent 60%);
+            filter: blur(40px);
+            opacity: 0.3;
+          }
+
+          .luxury-grid-glow-2 {
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            width: 30vw;
+            height: 30vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, ${PremiumColors.ElectricBlueEnd}03, transparent 60%);
+            filter: blur(40px);
+            opacity: 0.2;
+          }
+
+          .luxury-grid-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+          }
+
+          .luxury-grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid ${PremiumColors.GlassBorder};
+          }
+
+          .luxury-grid-title-section {
+            display: flex;
+            align-items: flex-end;
+            gap: 2rem;
+          }
+
+          .luxury-grid-title {
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: ${PremiumColors.PureWhite};
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin: 0;
+          }
+
+          .luxury-grid-count {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid ${PremiumColors.GlassBorder};
+            border-radius: 8px;
+          }
+
+          .luxury-count-number {
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: ${PremiumColors.ElectricBlueStart};
+            line-height: 1;
+          }
+
+          .luxury-count-label {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: ${PremiumColors.CoolGray};
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+          }
+
+          .luxury-grid-stats {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: ${PremiumColors.CoolGray};
+            letter-spacing: 0.05em;
+          }
+
+          .luxury-empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid ${PremiumColors.GlassBorder};
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+          }
+
+          .luxury-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+          }
+
+          .luxury-empty-title {
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: ${PremiumColors.PureWhite};
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+          }
+
+          .luxury-empty-description {
+            font-family: 'Satoshi', sans-serif;
+            font-weight: 400;
+            font-size: 1rem;
+            color: ${PremiumColors.CoolGray};
+            max-width: 400px;
+            margin: 0 auto 2rem auto;
+            line-height: 1.6;
+          }
+
+          .luxury-empty-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, ${PremiumColors.ElectricBlueStart}, ${PremiumColors.ElectricBlueEnd});
+            border: none;
+            border-radius: 12px;
+            color: ${PremiumColors.PureWhite};
+            font-family: 'Clash Display', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+          }
+
+          .luxury-empty-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 157, 255, 0.4);
+          }
+
+          .luxury-products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+          }
+
+          @media (max-width: 768px) {
+            .luxury-product-grid-section {
+              padding: 6rem 1rem 2rem 1rem;
+            }
+            
+            .luxury-grid-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 1rem;
+              margin-bottom: 3rem;
+            }
+            
+            .luxury-grid-title-section {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 1rem;
+            }
+            
+            .luxury-grid-title {
+              font-size: 2rem;
+            }
+            
+            .luxury-products-grid {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+            }
+          }
+
+          @media (min-width: 769px) and (max-width: 1024px) {
+            .luxury-products-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+
+          @media (min-width: 1025px) and (max-width: 1440px) {
+            .luxury-products-grid {
+              grid-template-columns: repeat(3, 1fr);
+            }
+          }
+
+          @media (min-width: 1441px) {
+            .luxury-products-grid {
+              grid-template-columns: repeat(4, 1fr);
+            }
+          }
+        `}</style>
+      </section>
+    );
+
+    return (
+      <div
+        className="luxury-product-listing-page"
+        style={{
+          backgroundColor: PremiumColors.DeepMatteBlack,
+          color: PremiumColors.PureWhite,
+          fontFamily: "'Clash Display', 'Satoshi', 'Outfit', sans-serif",
+          minHeight: '100vh'
+        }}
+      >
+        {renderLuxuryHeader()}
+        {renderLuxuryProductGrid()}
+        {renderLuxuryFilterModal()}
+      </div>
+    );
+  };
+
+  export default ProductListingPage;

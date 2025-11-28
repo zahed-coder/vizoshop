@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useContext } from 'react'; // Removed useEffect as it's not used directly
-import QuantitySelector from '../components/QuantitySelector'; // Import the reusable QuantitySelector
-import { CartContext } from '../context/CartContext';           // Import CartContext for state and actions
+import React, { useState, useCallback, useContext } from 'react';
+import QuantitySelector from '../components/QuantitySelector';
+import { CartContext } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+
 /**
  * CartPage Component
  * This component displays the user's shopping cart, allowing them to review,
@@ -18,6 +19,7 @@ const CartPage = ({ onNavigate }) => {
   const { cartItems, removeFromCart, updateQuantity, toggleItemSelected, toggleAllItemsSelected } = useContext(CartContext);
 
   const { t } = useLanguage();
+
   // --- Derived State/Calculations ---
   // Filter for items that are currently selected by the user for checkout.
   const selectedItems = cartItems.filter(item => item.isSelected);
@@ -40,7 +42,7 @@ const CartPage = ({ onNavigate }) => {
    */
   const handleQuantityChange = useCallback((productId, newQuantity) => {
     updateQuantity(productId, newQuantity);
-  }, [updateQuantity]); // Dependency on updateQuantity from context.
+  }, [updateQuantity]);
 
   /**
    * Handles the click event for the "Remove" button of an individual cart item.
@@ -49,7 +51,7 @@ const CartPage = ({ onNavigate }) => {
    */
   const handleRemoveItem = useCallback((productId) => {
     removeFromCart(productId);
-  }, [removeFromCart]); // Dependency on removeFromCart from context.
+  }, [removeFromCart]);
 
   /**
    * Handles the click event for the "Proceed to Checkout" button.
@@ -60,7 +62,7 @@ const CartPage = ({ onNavigate }) => {
     if (selectedItems.length > 0) {
       onNavigate('checkout', { selectedItems: selectedItems });
     }
-  }, [selectedItems, onNavigate]); // Dependencies on selectedItems and onNavigate prop.
+  }, [selectedItems, onNavigate]);
 
   // =====================================================================
   // --- Render Sections for the Page ---
@@ -72,7 +74,7 @@ const CartPage = ({ onNavigate }) => {
    */
   const renderPageHeader = () => (
     <h2 className="text-4xl md:text-5xl font-bold text-[#2b2b2b] mb-8 text-center drop-shadow-sm">
-      Your <span className="text-[#b3b3b3]">Shopping Cart</span>
+      {t('عربة التسوق الخاصة بك')} <span className="text-[#b3b3b3]">{t('المميزة')}</span>
     </h2>
   );
 
@@ -83,19 +85,19 @@ const CartPage = ({ onNavigate }) => {
   const renderEmptyCartState = () => (
     <div className="text-center py-20 bg-white rounded-xl shadow-lg border border-[#d4d4d4] animate-fade-in-down">
       <p className="text-2xl font-semibold text-[#b3b3b3] mb-6">
-        Your cart feels a little lonely.
+        {t('عربتك فارغة بعض الشيء.')}
       </p>
       <p className="text-lg text-[#4b5563] mb-8">
-        Why not explore our exquisite collections and find something you love?
+        {t('لماذا لا تستكشف مجموعاتنا الرائعة وتجد شيئًا تحبه؟')}
       </p>
       <button
         onClick={() => onNavigate('products')}
         className="bg-[#2b2b2b] text-white px-8 py-4 rounded-full text-lg font-semibold shadow-xl
                    hover:bg-[#b3b3b3] hover:shadow-2xl transition-all duration-300 transform hover:scale-105
                    focus:outline-none focus:ring-4 focus:ring-[#d4d4d4]"
-        aria-label="Start Shopping Now"
+        aria-label={t('ابدأ التسوق الآن')}
       >
-        Start Shopping Now
+        {t('ابدأ التسوق الآن')}
       </button>
     </div>
   );
@@ -112,14 +114,14 @@ const CartPage = ({ onNavigate }) => {
           type="checkbox"
           className="form-checkbox h-6 w-6 text-darkGrey rounded border-mediumGrey focus:ring-2 focus:ring-darkGrey transition-colors duration-200 cursor-pointer"
           checked={allItemsAreSelected}
-          onChange={(e) => toggleAllItemsSelected(e.target.checked)} // Calls context function
-          aria-label="Select all items in cart"
+          onChange={(e) => toggleAllItemsSelected(e.target.checked)}
+          aria-label={t('تحديد جميع العناصر في السلة')}
         />
-        <span>Select All Items</span>
+        <span>{t('تحديد جميع العناصر')}</span>
       </label>
       {/* Total Price for Selected Items */}
       <span className="text-xl font-bold text-[#2b2b2b] animate-pulse-price">
-        Total ({totalSelectedItems} items):{' '}
+        {t('الإجمالي')} ({totalSelectedItems} {t('عناصر')}):{' '}
         <span className="text-[#b3b3b3] drop-shadow-sm">${totalPriceSelected.toFixed(2)}</span>
       </span>
     </div>
@@ -145,16 +147,15 @@ const CartPage = ({ onNavigate }) => {
         type="checkbox"
         className="form-checkbox h-5 w-5 text-darkGrey rounded border-mediumGrey focus:ring-2 focus:ring-darkGrey transition-colors duration-200 cursor-pointer mb-4 md:mb-0 md:mr-4"
         checked={item.isSelected}
-        onChange={() => toggleItemSelected(item.id)} // Calls context function
-        aria-label={`Select ${item.name}`}
+        onChange={() => toggleItemSelected(item.id)}
+        aria-label={`${t('تحديد')} ${item.name}`}
       />
       {/* Product Image */}
       <img
         src={item.imageUrl}
         alt={item.name}
         className="w-24 h-24 object-cover rounded-md mr-4 border border-[#d4d4d4] shadow-sm flex-shrink-0"
-        // Fallback image if the primary image fails to load.
-        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/96x96/b3b3b3/FFFFFF?text=Item`; }}
+        onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/96x96/b3b3b3/FFFFFF?text=${t('عنصر')}`; }}
       />
       {/* Product Name and Price Details */}
       <div className="flex-grow text-center md:text-left mt-4 md:mt-0">
@@ -167,15 +168,15 @@ const CartPage = ({ onNavigate }) => {
       <div className="flex items-center space-x-4 mt-4 md:mt-0 md:ml-auto flex-shrink-0">
         <QuantitySelector
           quantity={item.quantity}
-          onQuantityChange={(qty) => handleQuantityChange(item.id, qty)} // Pass product ID and new quantity
+          onQuantityChange={(qty) => handleQuantityChange(item.id, qty)}
         />
         <button
-          onClick={() => handleRemoveItem(item.id)} // Call context function to remove item
+          onClick={() => handleRemoveItem(item.id)}
           className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-md
                      hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300 transform hover:scale-105 active:scale-95"
-          aria-label={`Remove ${item.name} from cart`}
+          aria-label={`${t('إزالة')} ${item.name} ${t('من السلة')}`}
         >
-          Remove
+          {t('إزالة')}
         </button>
       </div>
     </div>
@@ -193,31 +194,29 @@ const CartPage = ({ onNavigate }) => {
                    hover:bg-[#b3b3b3] hover:shadow-2xl transition-all duration-300
                    transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#d4d4d4]
                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md"
-        disabled={selectedItems.length === 0} // Disable if no items are selected
-        aria-label="Proceed to Checkout"
+        disabled={selectedItems.length === 0}
+        aria-label={t('المتابعة إلى الدفع')}
       >
-        Proceed to Checkout ({totalSelectedItems} items)
+        {t('المتابعة إلى الدفع')} ({totalSelectedItems} {t('عناصر')})
       </button>
     </div>
   );
 
   return (
     <div className="container mx-auto p-4 md:p-8 bg-white rounded-xl shadow-lg m-4 md:m-8 w-full max-w-5xl border border-[#d4d4d4] animate-fade-in">
-      {renderPageHeader()} {/* Page Title */}
+      {renderPageHeader()}
 
-      {/* Conditional Rendering: Empty Cart vs. Populated Cart */}
       {cartItems.length === 0 ? (
-        renderEmptyCartState() // Show empty cart message
+        renderEmptyCartState()
       ) : (
         <>
-          {renderCartSummaryAndControls()} {/* "Select All" and Summary */}
+          {renderCartSummaryAndControls()}
           <div className="space-y-6 mt-6">
-            {cartItems.map((item) => renderCartItemCard(item))} {/* List individual cart items */}
+            {cartItems.map((item) => renderCartItemCard(item))}
           </div>
-          {renderProceedToCheckoutButton()} {/* Checkout button */}
+          {renderProceedToCheckoutButton()}
         </>
       )}
-      {/* Note: All general animations and color variables are handled in App.css */}
     </div>
   );
 };
