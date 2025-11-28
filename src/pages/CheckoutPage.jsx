@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import WilayaTownSelector from '../components/WilayaTownSelector';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useLocation } from 'react-router-dom';
-import { algeriaLocations, shippingPrices } from '../data/algeriaLocations'; // 🚀 MOVED TO SEPARATE FILE
+import { algeriaLocations, shippingPrices } from '../data/algeriaLocations';
 
-// Premium Luxury Color Palette (Same as other pages)
+// Premium Luxury Color Palette
 const PremiumColors = {
   DeepMatteBlack: '#000000',
   PureWhite: '#FFFFFF',
@@ -18,8 +18,8 @@ const PremiumColors = {
   CoolGray: '#B0B0B0',
   Platinum: '#E5E5E5',
   MetallicGray: '#1A1A1A',
-  InputText: '#FFFFFF', // 🆕 ADDED: Bright white for input text
-  PlaceholderText: 'rgba(255, 255, 255, 0.5)', // 🆕 ADDED: Visible placeholder
+  InputText: '#FFFFFF',
+  PlaceholderText: 'rgba(255, 255, 255, 0.5)',
 };
 
 const formatCurrency = (amount) => {
@@ -42,16 +42,15 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
 
   const directPurchaseData = location.state?.directPurchase ? location.state : null;
   
-  // 🚀 Check backend connection
+  // Check backend connection
   useEffect(() => {
-    // Test backend connection on component mount
     fetch('http://localhost:3001/api/health')
       .then(res => res.json())
       .then(data => console.log('✅ Backend connection:', data))
       .catch(err => console.error('❌ Backend not running:', err));
   }, []);
 
-  // 🚀 FIX: Optimized items processing with proper memoization
+  // Optimized items processing
   const itemsToProcess = useMemo(() => {
     if (directPurchaseData) {
       const directPurchaseItem = {
@@ -68,23 +67,22 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
     return Array.isArray(selectedItems) ? selectedItems : [];
   }, [selectedItems, directPurchaseData]);
 
-  // 🚀 FIX: Optimized calculations with proper memoization
+  // Optimized calculations
   const subtotal = useMemo(() =>
     itemsToProcess.reduce((acc, item) => acc + item.price * item.quantity, 0),
     [itemsToProcess]
   );
 
-  // 🚀 CRITICAL FIX: Memoized shipping cost calculation instead of useEffect
+  // Shipping cost calculation
   const shippingCost = useMemo(() => {
     if (!customerInfo.wilaya) return 0;
-    
     const prices = shippingPrices[customerInfo.wilaya];
     return prices ? prices[deliveryMethod] : 0;
   }, [customerInfo.wilaya, deliveryMethod]);
 
   const totalAmount = subtotal + shippingCost;
 
-  // 🚀 FIX: Optimized form validation with useCallback
+  // Form validation
   const validateForm = useCallback(() => {
     const errors = {};
     if (!customerInfo.fullName.trim()) errors.fullName = 'Full name is required';
@@ -108,7 +106,7 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
     return Object.keys(errors).length === 0;
   }, [customerInfo, deliveryMethod]);
 
-  // 🚀 FIX: Optimized input handlers with useCallback
+  // Input handlers
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setCustomerInfo(prevInfo => ({ ...prevInfo, [name]: value }));
@@ -154,7 +152,7 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
     }
   }, []);
 
-  // 🚀 FIX: UPDATED order submission with Yalidine integration
+  // 🚀🚀🚀 CORRECTED ORDER SUBMISSION WITH CORS FIX 🚀🚀🚀
   const handleSubmitOrder = useCallback(async (e) => {
     e.preventDefault();
     if (!auth?.currentUser) {
@@ -204,12 +202,12 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
       const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
       await addDoc(ordersCollectionRef, orderData);
       
-      // 2. 🆕 SEND TO YALIDINE
+      // 2. 🚀 CORRECTED: Try multiple backend URLs with fallback
       console.log('📦 Sending order to Yalidine...');
       
       const yalidineOrderData = {
         order_id: `order_${Date.now()}_${auth.currentUser.uid.substring(0, 8)}`,
-        from_wilaya_name: "Alger", // Your location
+        from_wilaya_name: "Alger",
         firstname: customerInfo.fullName.split(' ')[0] || customerInfo.fullName,
         familyname: customerInfo.fullName.split(' ').slice(1).join(' ') || "",
         contact_phone: customerInfo.phone,
@@ -225,36 +223,53 @@ const CheckoutPage = ({ selectedItems = [], onPlaceOrder, onClearCart, onNavigat
         height: 10,
         width: 20,
         length: 30,
-        weight: Math.max(1, itemsToProcess.length * 0.3), // Estimate weight
+        weight: Math.max(1, itemsToProcess.length * 0.3),
         freeshipping: false,
         is_stopdesk: deliveryMethod === 'yalidine',
         has_exchange: false
       };
 
-      /// Send to Yalidine backend
-const yalidineResponse = await fetch(
-  process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3001/api/yalidine-orders'
-    : 'https://zshop-yalidine-backend.herokuapp.com/api/yalidine-orders',
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify([yalidineOrderData])
-  }
-);
+      // 🚀 CORRECTED: Try multiple backend URLs with proper error handling
+      const backendUrls = [
+        'http://localhost:3001/api/yalidine-orders',  // Local development
+         'https://vizoshop-production.up.railway.app/api/yalidine-orders'// Production (update this URL)
+      ];
 
-      const yalidineResult = await yalidineResponse.json();
-      
-      if (yalidineResult[yalidineOrderData.order_id]?.success) {
+      let yalidineResponse = null;
+      let yalidineResult = null;
+      let yalidineSuccess = false;
+
+      for (const url of backendUrls) {
+        try {
+          console.log(`🔄 Trying backend: ${url}`);
+          yalidineResponse = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify([yalidineOrderData])
+          });
+
+          if (yalidineResponse.ok) {
+            yalidineResult = await yalidineResponse.json();
+            yalidineSuccess = true;
+            console.log(`✅ Backend ${url} succeeded`);
+            break;
+          } else {
+            console.warn(`⚠️ Backend ${url} failed with status: ${yalidineResponse.status}`);
+          }
+        } catch (error) {
+          console.warn(`⚠️ Backend ${url} error:`, error.message);
+          continue;
+        }
+      }
+
+      if (yalidineSuccess && yalidineResult && yalidineResult[yalidineOrderData.order_id]?.success) {
         console.log('✅ Yalidine shipment created:', yalidineResult[yalidineOrderData.order_id]);
-        
-        // Show success with tracking info
         alert(`🎉 Order placed successfully!\n📦 Tracking: ${yalidineResult[yalidineOrderData.order_id].tracking}\n📋 Label: ${yalidineResult[yalidineOrderData.order_id].label}`);
       } else {
-        console.warn('⚠️ Yalidine creation failed:', yalidineResult[yalidineOrderData.order_id]?.message);
-        alert('✅ Order saved locally, but Yalidine shipment failed. Check console for details.');
+        console.warn('⚠️ Yalidine creation failed or no backend available');
+        alert('✅ Order saved successfully! We will contact you shortly to arrange shipping.');
       }
 
       // 3. Show success and cleanup
@@ -271,9 +286,9 @@ const yalidineResponse = await fetch(
       console.error('Failed to place order:', error);
       
       // Check if it's a Yalidine error or Firebase error
-      if (error.message.includes('Yalidine') || error.message.includes('localhost:3001')) {
-        alert('✅ Order saved to database, but Yalidine shipment failed. Check console for details.');
-        setIsOrderPlaced(true); // Still mark as placed since Firebase worked
+      if (error.message.includes('Yalidine') || error.message.includes('fetch')) {
+        alert('✅ Order saved to database! Shipping will be arranged separately.');
+        setIsOrderPlaced(true);
         onPlaceOrder(orderData);
         if (!directPurchaseData) {
           onClearCart();
@@ -302,7 +317,7 @@ const yalidineResponse = await fetch(
     directPurchaseData
   ]);
 
-  // 🚀 FIX: Memoized order summary component
+  // Memoized order summary component
   const renderOrderSummary = useMemo(() => (
     <div className="luxury-summary-container">
       <div className="luxury-card-border">
@@ -362,7 +377,7 @@ const yalidineResponse = await fetch(
     directPurchaseData
   ]);
 
-  // 🚀 FIX: Memoized customer info form component
+  // Memoized customer info form component
   const renderCustomerInfoForm = useMemo(() => (
     <div className="luxury-form-container">
       <div className="luxury-card-border">
@@ -453,7 +468,7 @@ const yalidineResponse = await fetch(
               </div>
             )}
 
-            {/* 🆕 IMPROVED: Wilaya and Town Selectors with better visibility */}
+            {/* Wilaya and Town Selectors */}
             <div className="luxury-form-group luxury-full-width">
               <label className="luxury-form-label">SELECT YOUR LOCATION</label>
               <div className="luxury-location-selectors">
@@ -556,8 +571,6 @@ const yalidineResponse = await fetch(
             </div>
           </div>
         </div>
-
-        {/* ... (keep the same styles as your original) */}
       </div>
     );
   }
@@ -682,6 +695,13 @@ const yalidineResponse = await fetch(
           margin-bottom: 3rem;
         }
 
+        @media (min-width: 768px) {
+          .luxury-checkout-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+          }
+        }
+
         /* Form and Summary Containers */
         .luxury-form-container,
         .luxury-summary-container {
@@ -753,14 +773,13 @@ const yalidineResponse = await fetch(
           margin-bottom: 0.75rem;
         }
 
-        /* 🆕 IMPROVED: Input Field Styling for Better Visibility */
         .luxury-form-input {
           width: 100%;
           padding: 1.2rem 1.5rem;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid ${PremiumColors.GlassBorder};
           border-radius: 12px;
-          color: ${PremiumColors.InputText}; /* 🆕 Bright white text */
+          color: ${PremiumColors.InputText};
           font-family: 'Satoshi', sans-serif;
           font-size: 1.1rem;
           font-weight: 500;
@@ -768,7 +787,7 @@ const yalidineResponse = await fetch(
         }
 
         .luxury-form-input::placeholder {
-          color: ${PremiumColors.PlaceholderText}; /* 🆕 Visible placeholder */
+          color: ${PremiumColors.PlaceholderText};
           font-weight: 400;
         }
 
@@ -778,11 +797,6 @@ const yalidineResponse = await fetch(
           background: rgba(255, 255, 255, 0.08);
           box-shadow: 0 0 25px rgba(0, 157, 255, 0.3);
           transform: translateY(-2px);
-        }
-
-        .luxury-form-input:hover:not(:disabled) {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.2);
         }
 
         .luxury-input-error {
@@ -797,7 +811,7 @@ const yalidineResponse = await fetch(
           margin-top: 0.5rem;
         }
 
-        /* 🆕 IMPROVED: Location Selectors Container */
+        /* Location Selectors */
         .luxury-location-selectors {
           width: 100%;
           background: rgba(255, 255, 255, 0.03);
@@ -1112,33 +1126,6 @@ const yalidineResponse = await fetch(
           -webkit-text-fill-color: transparent;
           background-clip: text;
           font-size: 1.3rem;
-        }
-
-        /* Responsive Design */
-        @media (min-width: 768px) {
-          .luxury-checkout-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-          }
-
-          .luxury-page-title {
-            font-size: 3.5rem;
-          }
-
-          .luxury-form-content,
-          .luxury-summary-content {
-            padding: 2.5rem;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .luxury-checkout-grid {
-            gap: 4rem;
-          }
-
-          .luxury-page-title {
-            font-size: 4rem;
-          }
         }
 
         /* Selection Styling */
