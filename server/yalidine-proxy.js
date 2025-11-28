@@ -2,12 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// CORS for production
+// CORS for all your domains
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://zshop-a0b8c.web.app', // 🆕 YOUR FIREBASE DOMAIN
-    'https://zshop-a0b8c.firebaseapp.com'
+    'https://zshop-a0b8c.web.app',
+    'https://zshop-a0b8c.firebaseapp.com',
+    'https://vizoshop.up.railway.app',  // 🎯 YOUR RAILWAY FRONTEND
+    'https://*.railway.app',            // 🎯 ALL RAILWAY DOMAINS
+    'https://*.railpack.app'            // 🎯 ALL RAILPACK DOMAINS
   ],
   credentials: true
 }));
@@ -109,11 +112,18 @@ app.post('/api/yalidine-orders', async (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: '🚀 Yalidine Proxy Server Running', domain: 'zshop-a0b8c.web.app' });
+  res.json({ 
+    status: '🚀 Yalidine Proxy Server Running', 
+    domains: [
+      'localhost:3000',
+      'zshop-a0b8c.web.app', 
+      'vizoshop.up.railway.app'
+    ]
+  });
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🎯 Yalidine Proxy Server running on port ${PORT}`);
-  console.log(`🔗 Ready for: https://zshop-a0b8c.web.app`);
+  console.log(`🔗 CORS enabled for: Railway, Firebase, Localhost`);
 });
